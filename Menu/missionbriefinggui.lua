@@ -246,7 +246,7 @@ function DescriptionItem:reduce_to_small_font()
 	end
 	local desc_text = self._scroll_panel:child("description_text")
 	local title_text = self._panel:child("title_text")
-	self._scroll_panel:set_h(self._panel:h())
+	self._scroll_panel:set_h(350)
 	self._scroll_panel:set_y(title_text:bottom())
 	self._scroll_panel:grow(0, -self._scroll_panel:y())
 	local show_scroll_line_top = 0 > desc_text:top()
@@ -1581,7 +1581,7 @@ end
 
 CrimeSpreeModifierItem = CrimeSpreeModifierItem or class(MissionBriefingTabItem)
 
-function CrimeSpreeModifierItem:init(panel, text, i, saved_descriptions)
+function CrimeSpreeModifierItem:init(panel, text, i, cs_modifiers_tab)
 	CrimeSpreeModifierItem.super.init(self, panel, text, i)
 
 	if not managers.job:has_active_job() then
@@ -1591,7 +1591,7 @@ function CrimeSpreeModifierItem:init(panel, text, i, saved_descriptions)
 	local stage_data = managers.job:current_stage_data()
 	local level_data = managers.job:current_level_data()
 	local name_id = stage_data.name_id or level_data.name_id
-	local briefing_id = managers.job:current_briefing_id()
+	local briefing_id = managers.crime_spree:active_modifiers()
 
 	if managers.skirmish:is_skirmish() and not managers.skirmish:is_weekly_skirmish() then
 		briefing_id = "heist_skm_random_briefing"
@@ -1635,31 +1635,39 @@ function CrimeSpreeModifierItem:init(panel, text, i, saved_descriptions)
 
 	self._scroll_panel:grow(-self._scroll_panel:x() - 10, -self._scroll_panel:y())
 
-	local desc_string = briefing_id and managers.localization:text(briefing_id) or ""
-	local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id()) and managers.groupai and managers.groupai:state():whisper_mode()
+	local upcoming_modifiers_text = ""
 
-	if is_level_ghostable and Network:is_server() then
-		if managers.job:is_level_ghostable_required(managers.job:current_level_id()) then
-			desc_string = desc_string .. "\n\n" .. managers.localization:text("menu_ghostable_stage_required")
-		else
-			desc_string = desc_string .. "\n\n" .. managers.localization:text("menu_ghostable_stage")
+	for i, category in ipairs({
+		"forced",
+		"loud",
+		"stealth"
+	}) do
+		local next_level = managers.crime_spree:next_modifier_level(category)
+
+		if next_level then
+			local text_id = "menu_cs_next_modifier_" .. category
+			local padding = i > 1 and "  " or ""
+			local localized = managers.localization:to_upper_text(text_id, {
+				next = next_level - managers.crime_spree:server_spree_level()
+			})
+			upcoming_modifiers_text = upcoming_modifiers_text .. padding .. localized
 		end
 	end
-
+	
 	local desc_text = self._scroll_panel:text({
 		name = "description_text",
 		wrap = true,
 		word_wrap = true,
-		text = desc_string,
+		text = upcoming_modifiers_text,
 		font_size = tweak_data.menu.pd2_small_font_size,
 		font = tweak_data.menu.pd2_small_font,
 		color = tweak_data.screen_colors.text
 	})
 
-	if saved_descriptions then
+	if cs_modifiers_tab then
 		local text = ""
 
-		for i, text_id in ipairs(saved_descriptions) do
+		for i, text_id in ipairs(cs_modifiers_tab) do
 			text = text .. managers.localization:text(text_id) .. "\n"
 		end
 
@@ -2012,9 +2020,11 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._description_item = DescriptionItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_description")), index, self._node:parameters().menu_component_data.saved_descriptions)
 	table.insert(self._items, self._description_item)
 	index = index + 1
-	self._assets_item = AssetsItem:new(self._panel, managers.preplanning:has_current_level_preplanning() and managers.localization:to_upper_text("menu_preplanning") or utf8.to_upper(managers.localization:text("menu_assets")), index, {}, nil, asset_data)
-	table.insert(self._items, self._assets_item)
-	index = index + 1
+	if not managers.skirmish:is_skirmish() then
+		self._assets_item = AssetsItem:new(self._panel, managers.preplanning:has_current_level_preplanning() and managers.localization:to_upper_text("menu_preplanning") or utf8.to_upper(managers.localization:text("menu_assets")), index, {}, nil, asset_data)
+		table.insert(self._items, self._assets_item)
+		index = index + 1
+	end
 	if managers.crime_spree:is_active() then
 		local gage_assets_data = {}
 		self._gage_assets_item = GageAssetsItem:new(self._panel, managers.localization:to_upper_text("menu_cs_gage_assets"), index)
@@ -2035,7 +2045,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		index = index + 1
 	end
 	if managers.crime_spree and managers.crime_spree:is_active() then
-		self._cs_modifer_item = CrimeSpreeModifierItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_cs_modifiers")), index, self._node:parameters().menu_component_data.saved_descriptions)
+		self._cs_modifer_item = CrimeSpreeModifierItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_cs_modifiers")), index, self._node:parameters().menu_component_data.cs_modifiers_tab)
 		table.insert(self._items, self._cs_modifer_item)
 		index = index + 1
 	end
@@ -2075,16 +2085,6 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self:chk_reduce_to_small_font()
 	self._selected_item = 0
 	self:set_tab(self._node:parameters().menu_component_data.selected_tab, true)
-	local box_panel = self._panel:panel()
-	box_panel:set_shape(self._items[self._selected_item]:panel():shape())
-	BoxGuiObject:new(box_panel, {
-		sides = {
-			0,
-			0,
-			0,
-			0
-		}
-	})
 	if managers.assets:is_all_textures_loaded() or #managers.assets:get_all_asset_ids(true) == 0 then
 		self:create_asset_tab()
 	end

@@ -10,7 +10,7 @@ function ChatGui:init(ws)
 	self:set_channel_id(ChatManager.GAME)
 	self._panel_width = self._hud_panel:w() * 0.5
 	self._output_width = self._panel_width - 15
-	self._panel_height = 500
+	self._panel_height = 510
 	self._max_lines = 5
 	self._lines = {}
 	self._esc_callback = callback(self, self, "esc_key_callback")
