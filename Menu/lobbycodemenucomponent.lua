@@ -11,11 +11,15 @@ local tiny_font_size = tweak_data.menu.pd2_tiny_font_size
 
 function LobbyCodeMenuComponent:init(ws, fullscreen_ws, node)
 	self._ws = ws
+	local y = 80
+	if managers.menu:active_menu().id == "kit_menu" then
+		y = 300
+	end
 	self._panel = self._ws:panel():panel({
 		w = 500,
 		layer = 100,
 		h = 100,
-		y = 300
+		y = y
 	})
 	Global.lobby_code = Global.lobby_code or {}
 

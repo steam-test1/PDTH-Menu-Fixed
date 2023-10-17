@@ -38,6 +38,7 @@ function MenuRenderer:show_node( node )
 		to_upper = true,
 		spacing = node:parameters().spacing
 	}
+	
 	MenuRenderer.super.show_node( self, node, parameters )
 end
 

@@ -37,7 +37,8 @@ PDTH_Menu.hook_files = {
     ["lib/managers/chatmanager"] = "Menu/chatmanager.lua",
     ["lib/managers/menu/menuinput"] = "Menu/menuinput.lua",
     ["lib/managers/social_hub/lobbycodemenucomponent"] = "Menu/lobbycodemenucomponent.lua",
-    ["lib/managers/menu/crimespreedetailsmenucomponent"] = "Menu/crimespreedetailsmenucomponent.lua"
+    ["lib/managers/menu/crimespreedetailsmenucomponent"] = "Menu/crimespreedetailsmenucomponent.lua",
+    ["lib/managers/menu/menucomponentmanager"] = "Menu/menucomponentmanager.lua"
     -- ["lib/managers/menu/crimespreemissionendoptions"] = "Menu/crimespreemissionendoptions.lua", 
 }
 
