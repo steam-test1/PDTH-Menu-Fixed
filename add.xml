@@ -1,0 +1,16 @@
+<table directory="assets">
+	<font path="PDTHMenu/fonts/pdth_menu_font" load="true"/>
+	<texture path="PDTHMenu/fonts/pdth_menu_font"/>
+	<merged_font path="PDTHMenu/fonts/pdth_menu_font"/>
+	<bnk path="soundbanks/menu" force="true"/>
+	<texture path="PDTHMenu/seven_figures_logo"/>
+	<texture path="PDTHMenu/trial_bridge"/>
+	<texture path="guis/textures/loading/loading_foreground_pdth"/>
+	<texture path="guis/textures/ingame_menu_bg" force="true"/>
+	<texture path="guis/textures/menu_arrows" force="true"/>
+	<texture path="guis/textures/menu_bg" force="true"/>
+	<texture path="guis/textures/menu_radiobutton" force="true"/>
+	<texture path="guis/textures/menu_selected" force="true"/>
+	<texture path="guis/textures/menu_singletick" force="true"/>
+	<texture path="guis/textures/menu_tickbox" force="true"/>
+</table>

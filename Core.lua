@@ -1,0 +1,2 @@
+function PDTHMenuFix:init()
+end

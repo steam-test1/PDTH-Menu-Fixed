@@ -1,0 +1,3 @@
+<mod name="PDTHMenuFix" global_key="PDTHMenuFix" core_class="Core.lua">
+    <AddFiles file="add.xml"/>
+</mod>
