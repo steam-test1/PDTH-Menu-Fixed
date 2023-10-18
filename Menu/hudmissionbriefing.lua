@@ -219,7 +219,11 @@ function HUDMissionBriefing:init(hud, workspace)
 		w = 256,
 		h = content_font_size,
 		layer = 1
-	})	
+	})
+	if managers.skirmish:is_skirmish() then
+		self._difficulty_title:set_visible(false)
+		self._difficulty_text:set_visible(false)
+	end
 	self._day_title = self._gui_info_panel:text({
 		name = "day_title",
 		text = string.upper(managers.localization:text("menu_day_short", {day = ""}))..":",
@@ -229,7 +233,8 @@ function HUDMissionBriefing:init(hud, workspace)
 		vertical = "center",
 		w = 256,
 		h = content_font_size,
-		layer = 1
+		layer = 1,
+		visible = false
 	})	
 	self._day_text = self._gui_info_panel:text({
 		name = "day_text",
@@ -241,8 +246,18 @@ function HUDMissionBriefing:init(hud, workspace)
 		vertical = "center",
 		w = 256,
 		h = content_font_size,
-		layer = 1
+		layer = 1,
+		visible = false
 	})
+	
+	self._current_stage_data = managers.job:current_stage_data()
+	self._current_job_chain = managers.job:current_job_chain_data()
+	
+	if #self._current_job_chain > 1 then
+		self._day_title:set_visible(true)
+		self._day_text:set_visible(true)
+	end
+
 	local offset = 22 
 	local x, y, w, h = self._server_title:text_rect()
 	self._server_title:set_x(10)
@@ -264,19 +279,24 @@ function HUDMissionBriefing:init(hud, workspace)
 	self._level_title:set_w(w)
 	self._level_text:set_lefttop(self._level_title:righttop())
 	self._level_text:set_w(self._gui_info_panel:w())
-	local x, y, w, h = self._difficulty_title:text_rect()
-	self._difficulty_title:set_x(10)
-	self._difficulty_title:set_y(10 + offset * (is_multiplayer and 3 or 1))
-	self._difficulty_title:set_w(w)
-	self._difficulty_text:set_lefttop(self._difficulty_title:righttop())
-	self._difficulty_text:set_w(self._gui_info_panel:w())	
+	
+	if not managers.skirmish:is_skirmish() then
+		local x, y, w, h = self._difficulty_title:text_rect()
+		self._difficulty_title:set_x(10)
+		self._difficulty_title:set_y(10 + offset * (is_multiplayer and 3 or 1))
+		self._difficulty_title:set_w(w)
+		self._difficulty_text:set_lefttop(self._difficulty_title:righttop())
+		self._difficulty_text:set_w(self._gui_info_panel:w())	
+	end
 
-	local x, y, w, h = self._day_title:text_rect()
-	self._day_title:set_x(10)
-	self._day_title:set_y(10 + offset * (is_multiplayer and 4 or 2))
-	self._day_title:set_w(w)
-	self._day_text:set_lefttop(self._day_title:righttop())
-	self._day_text:set_w(self._gui_info_panel:w())
+	if #self._current_job_chain > 1 then
+		local x, y, w, h = self._day_title:text_rect()
+		self._day_title:set_x(10)
+		self._day_title:set_y(10 + offset * (is_multiplayer and 4 or 2))
+		self._day_title:set_w(w)
+		self._day_text:set_lefttop(self._day_title:righttop())
+		self._day_text:set_w(self._gui_info_panel:w())
+	end
 
 	self._ready_slot_panel:set_bottom(self._foreground_layer_one:h())
 	self._ready_slot_panel:set_left(self._foreground_layer_one:left() - 15 )	
@@ -463,9 +483,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	end
 	self._current_contact_data = managers.job:current_contact_data()
 	self._current_level_data = managers.job:current_level_data()
-	self._current_stage_data = managers.job:current_stage_data()
 	self._current_job_data = managers.job:current_job_data()
-	self._current_job_chain = managers.job:current_job_chain_data()
 	self._job_class = self._current_job_data and self._current_job_data.jc or 0
 	local contact_gui = self._background_layer_two:gui(self._current_contact_data.assets_gui, {})
 	local contact_pattern = contact_gui:has_script() and contact_gui:script().pattern

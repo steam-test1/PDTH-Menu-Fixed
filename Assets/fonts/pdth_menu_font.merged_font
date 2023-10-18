@@ -1,0 +1,10 @@
+<merged_font>
+      <font name="fonts/pdth_menu_font"/>
+	<font name="fonts/font_small_cyrillic"/>
+	<font name="fonts/font_small_buttons"/>
+	<font name="fonts/font_support_small"/>
+
+	<font name="fonts/font_small_csicons"/>
+      <font name="fonts/font_small_buttons_old_ps3" color="ffffff"/>
+      
+</merged_font>

@@ -158,7 +158,7 @@ if not PDTH_Menu.setup and Hooks then
     PDTHMenu_color_normal = PDTH_Menu.colors[PDTH_Menu.options.PDTH_Menucolor].color
     PDTHMenu_color_highlight = PDTH_Menu.colors[PDTH_Menu.options.pdth_highlightcolor].color
     PDTHMenu_color_marker = PDTH_Menu.colors[PDTH_Menu.options.pdth_markercolor].color
-    PDTHMenu_font = PDTH_Menu.options.font_enable and "PDTHMenu/fonts/pdth_menu_font" or "fonts/font_medium_mf"
+    PDTHMenu_font = PDTH_Menu.options.font_enable and "fonts/pdth_menu_font" or "fonts/font_medium_mf"
     PDTHMenu_font_size = PDTH_Menu.options.font_enable and 16 or 19
 	PDTHMenu_align = "left" --Not recommended to change might cause issues.
  	log("[PDTH Menu] Done loading all options")

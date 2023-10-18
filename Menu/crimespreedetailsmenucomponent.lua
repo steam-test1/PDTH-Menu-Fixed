@@ -15,3 +15,19 @@ function CrimeSpreeDetailsMenuComponent:populate_tabs_data(tabs_data)
 		})
 	end
 end
+
+local _start_page_data_orig = CrimeSpreeDetailsMenuComponent._start_page_data
+function CrimeSpreeDetailsMenuComponent:_start_page_data()
+	local data = _start_page_data_orig(self)
+	data.outline_data = {
+		layer = 100,
+		sides = {
+			0,
+			0,
+			0,
+			0
+		}
+	}
+
+	return data
+end

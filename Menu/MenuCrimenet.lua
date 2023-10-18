@@ -6,7 +6,6 @@ local make_fine_text = function(text)
 	text:set_position(math.round(text:x()), math.round(text:y()))
 end
 
-CloneClass(MenuNodeGui)
 function MenuNodeCrimenetGui:init(node, layer, parameters)
 	parameters.font = tweak_data.menu.pd2_small_font
 	parameters.font_size = tweak_data.menu.pd2_small_font_size
@@ -20,7 +19,7 @@ function MenuNodeCrimenetGui:init(node, layer, parameters)
 	MenuNodeCrimenetGui.super.init(self, node, layer, parameters)
 end
 
-MenuNodeCrimenetFiltersGui = MenuNodeCrimenetFiltersGui or class(MenuNodeGui)
+MenuNodeCrimenetFiltersGui = MenuNodeCrimenetFiltersGui or class(CoreMenuNodeGui.NodeGui)
 function MenuNodeCrimenetFiltersGui:init(node, layer, parameters)
 	parameters.font = tweak_data.menu.pd2_small_font
 	parameters.font_size = tweak_data.menu.pd2_small_font_size
@@ -56,7 +55,7 @@ function MenuNodeCrimenetSpecialGui:_setup_item_panel(safe_rect, res)
 	title_text:set_bottom(self.box_panel:top())
 end
 
-MenuNodeCrimenetCasinoGui = MenuNodeCrimenetCasinoGui or class(MenuNodeGui)
+MenuNodeCrimenetCasinoGui = MenuNodeCrimenetCasinoGui or class(CoreMenuNodeGui.NodeGui)
 function MenuNodeCrimenetCasinoGui:init(node, layer, parameters)
 	parameters.font = tweak_data.menu.pd2_small_font
 	parameters.font_size = tweak_data.menu.pd2_small_font_size
@@ -550,7 +549,7 @@ function MenuNodeCrimenetCasinoGui:set_update_values(preferred_card, secured_car
 end
 
 
-MenuNodeCrimenetContactInfoGui = MenuNodeCrimenetContactInfoGui or class(MenuNodeGui)
+MenuNodeCrimenetContactInfoGui = MenuNodeCrimenetContactInfoGui or class(CoreMenuNodeGui.NodeGui)
 MenuNodeCrimenetContactInfoGui.WIDTH = 600
 MenuNodeCrimenetContactInfoGui.HEIGHT = 465
 MenuNodeCrimenetContactInfoGui.MENU_WIDTH = 220

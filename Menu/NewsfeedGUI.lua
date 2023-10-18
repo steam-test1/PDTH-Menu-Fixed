@@ -1,5 +1,3 @@
-
-CloneClass(TextBoxGui)
 NewsFeedGui.PRESENT_TIME = 0.5
 NewsFeedGui.SUSTAIN_TIME = 6
 NewsFeedGui.REMOVE_TIME = 0.5
