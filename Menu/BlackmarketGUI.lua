@@ -60,7 +60,7 @@ Hooks:PostHook(BlackMarketGui, "_setup", "pdthmenu", function(self, is_start_pag
 		local back_button = self._panel:child("back_button")
 		back_button:set_color(PDTHMenu_color_normal)
 		if PDTH_Menu.options.font_enable then
-			back_button:set_font(Idstring"fonts/pdth_menu_font")
+			back_button:set_font(Idstring"fonts/font_small_shadow")
 			back_button:set_font_size(19)
 		end
 		if self._fullscreen_panel:child("back_button") then

@@ -727,6 +727,6 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 	self:step_stage_up()
 end
 
-Hooks:PostHook(HUDStageEndScreen, "stage_money_counter_init", "hide_money_video", function(self)
+Hooks:PostHook(HUDStageEndScreen, "create_money_counter", "fuck_the_video", function(self)
 	self._background_layer_full:child("money_video"):set_visible(false)
 end)
