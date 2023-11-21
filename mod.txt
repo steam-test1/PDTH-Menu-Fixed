@@ -58,6 +58,10 @@
 
         {"hook_id" : "lib/managers/social_hub/lobbycodemenucomponent", "script_path" : "menubase.lua"},
         {"hook_id" : "lib/managers/menu/crimespreedetailsmenucomponent", "script_path" : "menubase.lua"},
-        {"hook_id" : "lib/managers/menu/menucomponentmanager", "script_path" : "menubase.lua"}
+        {"hook_id" : "lib/managers/menu/menucomponentmanager", "script_path" : "menubase.lua"},
+        {"hook_id" : "lib/tweak_data/tweakdata", "script_path" : "menubase.lua"},
+        {"hook_id" : "lib/managers/menu/renderers/menunodereticleswitchgui", "script_path" : "menubase.lua"},
+        {"hook_id" : "lib/managers/menu/renderers/menunodecustomizegadgetgui", "script_path" : "menubase.lua"},
+        {"hook_id" : "core/lib/managers/menu/reference_renderer/coremenunodegui", "script_path" : "Menu/coremenunodegui.lua"}
     ]
 }

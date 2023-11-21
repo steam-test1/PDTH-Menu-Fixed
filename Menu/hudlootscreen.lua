@@ -6,7 +6,7 @@ function HUDLootScreen:init(hud, workspace, saved_lootdrop, saved_selected, save
 	self._backdrop:create_black_borders()
 	local get_texture
 	if PDTH_Menu.options.enable_pdth_endscreen_texture then
-		self._backdrop:set_bg("PDTHMenu/seven_figures_logo")
+		self._backdrop:set_bg("PDTHMenu/seven_figures_logo_without_bills_bg")
 	end
 	self._active = false
 	self._hud = hud

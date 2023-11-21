@@ -1,11 +1,11 @@
-<table directory="assets">
-	<font path="fonts/pdth_menu_font" load="true"/>
-	<texture path="fonts/pdth_menu_font"/>
-	<merged_font path="fonts/pdth_menu_font"/>
+<table directory="Assets">
+	<font path="fonts/font_small_shadow" load="true" force="true"/>
+	<texture path="fonts/font_small_shadow" force="true"/>
+	<merged_font path="fonts/font_small_shadow_mf" force="true"/>
 	<bnk path="soundbanks/menu" force="true"/>
-	<texture path="PDTHMenu/seven_figures_logo"/>
+	<texture path="PDTHMenu/seven_figures_logo_without_bills_bg"/>
 	<texture path="PDTHMenu/trial_bridge"/>
-	<texture path="guis/textures/loading/loading_foreground_pdth"/>
+	<texture path="guis/textures/loading/loading_foreground_pdth_original"/>
 	<texture path="guis/textures/ingame_menu_bg" force="true"/>
 	<texture path="guis/textures/menu_arrows" force="true"/>
 	<texture path="guis/textures/menu_bg" force="true"/>

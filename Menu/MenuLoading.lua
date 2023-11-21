@@ -254,7 +254,7 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 	local get_texture
 
 	if PDTH_Menu.options.enable_pdth_level_loading then
-		get_texture = "guis/textures/loading/loading_foreground_pdth"
+		get_texture = "guis/textures/loading/loading_foreground_pdth_original"
 	else
 		get_texture = self._gui_data.bg_texture
 	end
@@ -285,6 +285,88 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 
 	if arg.load_level_data.tip then
 		self._loading_hint = self:_make_loading_hint(saferect_panel, arg.load_level_data.tip)
+	end
+
+	if challenges then
+		self._challenges_topic = saferect_panel:text({
+			text_id = "menu_near_completion_challenges",
+			font = "fonts/font_medium_mf",
+			font_size = self._menu_tweak_data.loading_challenge_name_font_size - 6,
+			align = "left",
+			layer = base_layer + 1
+		})
+		self._challenges_topic:set_shape(self._challenges_topic:text_rect())
+		self._challenges = {}
+		for _, challenge in pairs(challenges) do
+			local panel = saferect_panel:panel({
+				layer = base_layer,
+				w = 140 * self._scale_tweak_data.loading_challenge_bar_scale,
+				h = 22 * self._scale_tweak_data.loading_challenge_bar_scale
+			})
+			local bg_bar = panel:rect({
+				x = 0,
+				y = 0,
+				w = panel:w(),
+				h = panel:h(),
+				color = Color.black:with_alpha(0.5),
+				align = "center",
+				halign = "center",
+				vertical = "center",
+				layer = base_layer + 1
+			})
+			local bar = panel:gradient({
+				orientation = "vertical",
+				gradient_points = {
+					0,
+					Color(1, 1, 0.65882355, 0),
+					1,
+					Color(1, 0.6039216, 0.4, 0)
+				},
+				x = 2 * self._scale_tweak_data.loading_challenge_bar_scale,
+				y = 2 * self._scale_tweak_data.loading_challenge_bar_scale,
+				w = (bg_bar:w() - 4 * self._scale_tweak_data.loading_challenge_bar_scale) * (challenge.amount / challenge.count),
+				h = bg_bar:h() - 4 * self._scale_tweak_data.loading_challenge_bar_scale,
+				layer = base_layer + 2,
+				align = "center",
+				halign = "center",
+				vertical = "center"
+			})
+			local progress_text = panel:text({
+				font_size = self._menu_tweak_data.loading_challenge_progress_font_size - 6,
+				font = "fonts/font_medium_mf",
+				x = 0,
+				y = 0,
+				h = bg_bar:h(),
+				w = bg_bar:w(),
+				align = "center",
+				halign = "center",
+				vertical = "center",
+				valign = "center",
+				layer = base_layer + 3,
+				text = challenge.amount .. "/" .. challenge.count
+			})
+			local text = saferect_panel:text({
+				text = string.upper(challenge.name),
+				font = "fonts/font_medium_mf",
+				font_size = self._menu_tweak_data.loading_challenge_name_font_size - 6,
+				align = "left",
+				layer = base_layer + 1
+			})
+			text:set_shape(text:text_rect())
+			table.insert(self._challenges, {panel = panel, text = text})
+		end
+
+		for i, challenge in ipairs(self._challenges) do
+			local h = challenge.panel:h()
+			challenge.panel:set_bottom((saferect_panel:bottom() - h * 2 - 2) - (h + 2) * (#self._challenges - i))
+			challenge.text:set_left(challenge.panel:right() + 8 * self._scale_tweak_data.loading_challenge_bar_scale)
+			challenge.text:set_center_y(challenge.panel:center_y())
+		end
+
+		self._challenges_topic:set_visible(self._challenges[1] and true or false)
+		if self._challenges[1] then
+			self._challenges_topic:set_bottom(self._challenges[1].panel:top() - 4)
+		end
 	end
 
 	self._level_title_text:set_text(string.upper((self._level_tweak_data.name or "") .. " > " .. self._level_title_text:text()))

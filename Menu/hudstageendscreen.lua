@@ -197,7 +197,7 @@ function HUDStageEndScreen:init(hud, workspace)
 	self._backdrop = MenuBackdropGUI:new(workspace)
 	self._backdrop:create_black_borders()
 	if PDTH_Menu.options.enable_pdth_endscreen_texture then
-		self._backdrop:set_bg("PDTHMenu/seven_figures_logo")
+		self._backdrop:set_bg("PDTHMenu/seven_figures_logo_without_bills_bg")
 	end
 	self._hud = hud
 	self._workspace = workspace
@@ -727,6 +727,6 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 	self:step_stage_up()
 end
 
-Hooks:PostHook(HUDStageEndScreen, "stage_money_counter_init", "hide_money_video", function(self)
+Hooks:PostHook(HUDStageEndScreen, "create_money_counter", "fuck_the_video", function(self)
 	self._background_layer_full:child("money_video"):set_visible(false)
 end)

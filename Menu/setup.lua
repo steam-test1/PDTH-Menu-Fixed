@@ -14,13 +14,13 @@ function Setup:_start_loading_screen()
 
 	cat_print("loading_environment", "[LoadingEnvironment] Start.")
 
-	local setup = nil
+	local setup
 
 	if not LoadingEnvironmentScene:loaded() then
 		LoadingEnvironmentScene:load("levels/zone", false)
 	end
 
-	local load_level_data = nil
+	local load_level_data
 
 	if Global.load_level then
 		if not PackageManager:loaded("packages/load_level") then
@@ -42,6 +42,15 @@ function Setup:_start_loading_screen()
 
 		if show_hints then
 			load_level_data.tip = tweak_data.tips:get_a_tip()
+		end
+
+		if managers.challenges then
+			local challenges = managers.challenges:get_near_completion()
+			load_level_data.challenges = {
+				challenges[1],
+				challenges[2],
+				challenges[3]
+			}
 		end
 
 		if show_controller then

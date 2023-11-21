@@ -212,3 +212,12 @@ function CrimeNetGui:mouse_moved(o, x, y)
 
 	return used, pointer
 end
+
+local close_original = CrimeNetGui.close
+function CrimeNetGui:close()
+	close_original(self)
+	if self._back_marker then
+		self._back_marker:set_visible(false)
+		self._back_marker = nil
+	end
+end

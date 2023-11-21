@@ -1,3 +1,4 @@
+core:import("CoreMenuRenderer")
 function MenuRenderer:init( logic, ... )
 	MenuRenderer.super.init( self, logic, ... )
 	self._sound_source = SoundDevice:create_source( "MenuRenderer" )
@@ -8,36 +9,49 @@ function MenuRenderer:show_node( node )
 		gui_class = CoreSerialize.string_to_classtable( node:parameters().gui_class )
 	end
 	local alignment
-	local exclude = {
-		-- "jukebox_menu_tracks",
-		"jukebox_menu_playlist",
-		-- "jukebox_heist_tracks",
-		"jukebox_heist_playlist",
-		-- "jukebox_ghost_tracks",
-		"jukebox_ghost_playlist",
-		-- "blackmarket_reticle_switch",
-		-- "blackmarket_customize_gadget",
-		"pdth_hud_active_challenges",
-		"pdth_hud_completed_challenges"
-	}
-    if node:parameters().name ==  exclude then
-   		alignment = "right"
-    else
-   		alignment = "left"
-    end
+	if node:parameters().name == "jukebox_menu_playlist" or node:parameters().name == "jukebox_heist_playlist" or node:parameters().name == "jukebox_ghost_playlist" or node:parameters().name == "base_lua_mods_menu" then
+		alignment = "right"
+	else
+		alignment = "left"
+	end
+	-- local old_font = tweak_data.menu.pd2_medium_font
+	-- local old_font_size = 19
+	-- if PDTH_Menu.options.font_enable then
+	-- 	old_font = tweak_data.menu.pdth_menu_font
+	-- 	old_font_size = tweak_data.menu.pdth_menu_font_size
+	-- end
 	local parameters = {
+		-- font = tweak_data.menu.pdth_menu_font,
+		-- row_item_color = PDTHMenu_color_normal,
+		-- row_item_hightlight_color = PDTHMenu_color_highlight,
+		-- row_item_blend_mode = "normal",
+		-- font_size = tweak_data.menu.pdth_menu_font_size,
+		-- node_gui_class = gui_class,
+		-- marker_alpha = 1,
+		-- marker_color = PDTHMenu_color_marker,
+		-- align = alignment,
+		-- to_upper = true,
+		-- spacing = node:parameters().spacing
+
+		marker_alpha = 1,
+		align = alignment,
+		row_item_blend_mode = "normal",
+		to_upper = true,
 		font = PDTHMenu_font,
 		row_item_color = PDTHMenu_color_normal,
 		row_item_hightlight_color = PDTHMenu_color_highlight,
-		row_item_blend_mode = "normal",
 		font_size = PDTHMenu_font_size,
 		node_gui_class = gui_class,
-		marker_alpha = 1,
-		marker_color = PDTHMenu_color_marker,
-		align = alignment,
-		to_upper = true,
-		spacing = node:parameters().spacing
+		spacing = node:parameters().spacing,
+		marker_color = PDTHMenu_color_marker
 	}
+
+	local previous_node_gui = self._node_gui_stack[#self._node_gui_stack - 1]
+
+	if previous_node_gui and (node:parameters().hide_previous == false or node:parameters().hide_previous == "false") then
+		previous_node_gui:set_visible(true)
+	end
+
 	MenuRenderer.super.show_node( self, node, parameters )
 end
 
@@ -107,7 +121,8 @@ function MenuRenderer:_create_bottom_text()
 	})
 	self._bottom_text = self._main_panel:text({
 		text = "",
-		wrap = true, word_wrap = true,
+		wrap = true,
+		word_wrap = true,
 		font = PDTHMenu_font,
 		font_size = PDTHMenu_font_size,
 		align= PDTHMenu_align,

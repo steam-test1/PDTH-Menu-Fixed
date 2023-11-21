@@ -84,6 +84,9 @@ function MenuNodeGui:_create_marker(node)
 	if self.marker_color ~= tweak_data.screen_colors.button_stage_3 or self.marker_color ~= tweak_data.screen_colors.button_stage_2 then
 		self._marker_data.gradient:set_color(self.marker_color)
 	end
+	-- if managers.menu:active_menu().logic:selected_node():parameters().name == "main" then
+	-- 	self._marker_panel:set_visible(false)
+	-- end
 end
 
 function MenuNodeGui:_create_menu_item(row_item)
