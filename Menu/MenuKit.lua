@@ -1,6 +1,7 @@
 
 core:import("CoreMenuNodeGui")
 require("lib/managers/menu/MenuNodeKitGui")
+CloneClass(MenuLobbyRenderer)
 
 function MenuKitRenderer:show_node(node)
 	local gui_class = MenuNodeKitGui

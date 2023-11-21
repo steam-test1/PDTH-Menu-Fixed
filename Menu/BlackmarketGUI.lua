@@ -57,24 +57,22 @@ function BlackMarketGuiButtonItem:refresh()
 	self._panel:child("select_rect"):set_visible(self._highlighted)
 end
 Hooks:PostHook(BlackMarketGui, "_setup", "pdthmenu", function(self, is_start_page, component_data)
+	if managers.menu:is_pc_controller() then
 		local back_button = self._panel:child("back_button")
 		back_button:set_color(PDTHMenu_color_normal)
-		if PDTH_Menu.options.font_enable then
-			back_button:set_font(Idstring"fonts/pdth_menu_font")
-			back_button:set_font_size(19)
-		end
+		back_button:set_font_size(tweak_data.menu.pd2_medium_font_size)
 		if self._fullscreen_panel:child("back_button") then
 			self._fullscreen_panel:child("back_button"):hide()
 		end
 		self._back_marker = self._panel:bitmap({
-			name = "back_marker",
 			color = PDTHMenu_color_marker,
+			visible = false,
 			layer = self._panel:child("back_button"):layer() - 1
 		})
 		x,y,w,h = back_button:text_rect()
 		self._back_marker:set_shape(x,y,313,h)
 		self._back_marker:set_right(x + w)
-		self._back_marker:set_visible(managers.menu:is_pc_controller() and false)
+	end		
 end)
 
 function BlackMarketGui:mouse_moved(o, x, y)
@@ -89,59 +87,6 @@ function BlackMarketGui:mouse_moved(o, x, y)
 	end
 	if alive(self._no_input_panel) then
 		self._no_input = self._no_input_panel:inside(x, y)
-	end
-	if alive(self._context_panel) then
-		local context_btns = self._context_panel:child("btns"):children()
-		local update_select = false
-
-		if not self._context_btn_selected then
-			update_select = true
-		elseif not context_btns[self._context_btn_selected]:inside(x, y) then
-			context_btns[self._context_btn_selected]:set_color(tweak_data.screen_colors.button_stage_3)
-
-			self._context_btn_selected = nil
-			update_select = true
-		end
-
-		if update_select then
-			for i, btn in ipairs(context_btns) do
-				if btn:inside(x, y) then
-					self._context_btn_selected = i
-
-					managers.menu_component:post_event("highlight")
-					btn:set_color(tweak_data.screen_colors.button_stage_2)
-
-					break
-				end
-			end
-		end
-
-		if self._context_btn_selected then
-			return true, "link"
-		end
-
-		local used = false
-		local pointer = "arrow"
-
-		if self._panel:child("back_button"):inside(x, y) then
-			used = true
-			pointer = "link"
-
-			if not self._back_button_highlighted then
-				self._back_button_highlighted = true
-
-				self._panel:child("back_button"):set_color(tweak_data.screen_colors.button_stage_2)
-				managers.menu_component:post_event("highlight")
-
-				return used, pointer
-			end
-		elseif self._back_button_highlighted then
-			self._back_button_highlighted = false
-
-			self._panel:child("back_button"):set_color(tweak_data.screen_colors.button_stage_3)
-		end
-
-		return used, pointer
 	end
 	if self._extra_options_data then
 		local used = false
@@ -314,13 +259,13 @@ function BlackMarketGui:mouse_moved(o, x, y)
 		if not self._back_button_highlighted then
 			self._back_button_highlighted = true
 			self._panel:child("back_button"):set_color(PDTHMenu_color_highlight)
-			self._panel:child("back_marker"):show()
+			self._back_marker:show()
 			managers.menu_component:post_event("highlight")
 			return used, pointer
 		end
 	elseif self._back_button_highlighted then
 		self._back_button_highlighted = false
-		self._panel:child("back_marker"):hide()
+		self._back_marker:hide()
 		self._panel:child("back_button"):set_color(PDTHMenu_color_normal)
 	end
 	update_select = false

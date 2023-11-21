@@ -1,23 +1,15 @@
 {
     "name" : "PDTH Menu v2",
     "description" : "PDTH Menu broguht to payday 2!",
-    "author" : "Luffy, Sora, Test1",
-    "version" : "8.44",
+    "author" : "Luffy",
+    "version" : "2.0.2",
     "priority" : 1,
-    "updates": [
-        {
-            "identifier": "pdthmenufix",
-            "host": {
-				"meta": "https://raw.githubusercontent.com/steam-test1/PD2Updates/master/updates_metas/meta_pdthmenufix.json"
-			}
-        }
-    ],
-	"hooks" : [
+    "hooks" : [
         {"hook_id" : "lib/managers/menumanager", "script_path" : "menubase.lua"},  
-        {"hook_id" : "lib/setups/setup", "script_path" : "Menu/setup.lua"},  
+        {"hook_id" : "lib/setups/setup", "script_path" : "menu/setup.lua"},  
         {"hook_id" : "lib/managers/chatmanager", "script_path" : "menubase.lua"}, 
         {"hook_id" : "lib/managers/menu/items/menuitemcustomizecontroller", "script_path" : "menubase.lua"},
-        {"hook_id" : "core/lib/managers/menu/items/coremenuitemtoggle", "script_path" : "Menu/menutoggle.lua"},
+        {"hook_id" : "core/lib/managers/menu/items/coremenuitemtoggle", "script_path" : "menu/menutoggle.lua"},
         {"hook_id" : "lib/managers/menu/items/menuitemmultichoice", "script_path" : "menubase.lua"},
         {"hook_id" : "lib/managers/menu/menulobbyrenderer", "script_path" : "menubase.lua"},
         {"hook_id" : "lib/managers/menu/renderers/menunodejukeboxgui", "script_path" : "menubase.lua"},
@@ -46,18 +38,14 @@
         {"hook_id" : "lib/managers/hud/hudstageendscreen", "script_path" : "menubase.lua"}, 
         {"hook_id" : "lib/managers/hud/hudlootscreen", "script_path" : "menubase.lua"},
 
-        {"hook_id" : "lib/managers/menu/missionbriefinggui", "script_path" : "menubase.lua"},
-        {"hook_id" : "lib/managers/menu/menuinput", "script_path" : "menubase.lua"}, 
-        {"hook_id" : "lib/managers/menu/crimespreemissionendoptions", "script_path" : "menubase.lua"},
+        {"hook_id" : "lib/managers/menu/missionbriefinggui", "script_path" : "menubase.lua"}, 
         {"hook_id" : "lib/managers/menu/imageboxgui", "script_path" : "menubase.lua"}, 
         {"hook_id" : "lib/managers/crimenetmanager", "script_path" : "menubase.lua"}, 
-        {"hook_id" : "lib/utils/levelloadingscreenguiscript", "script_path" : "Menu/menuloading.lua"},
-        {"hook_id" : "lib/utils/lightloadingscreenguiscript", "script_path" : "Menu/lightloading.lua"},
-        {"hook_id" : "core/lib/managers/menu/items/coremenuitemslider", "script_path" : "Menu/menuslider.lua"},
-        {"hook_id" : "core/lib/managers/menu/reference_renderer/coremenurenderer", "script_path" : "Menu/coremenurenderer.lua"},
-
-        {"hook_id" : "lib/managers/social_hub/lobbycodemenucomponent", "script_path" : "menubase.lua"},
-        {"hook_id" : "lib/managers/menu/crimespreedetailsmenucomponent", "script_path" : "menubase.lua"},
-        {"hook_id" : "lib/managers/menu/menucomponentmanager", "script_path" : "menubase.lua"}
+        {"hook_id" : "lib/utils/levelloadingscreenguiscript", "script_path" : "menu/menuloading.lua"},
+        {"hook_id" : "lib/utils/lightloadingscreenguiscript", "script_path" : "menu/lightloading.lua"},
+        {"hook_id" : "core/lib/managers/menu/items/coremenuitemslider", "script_path" : "menu/menuslider.lua"},
+        {"hook_id" : "core/lib/managers/menu/reference_renderer/coremenurenderer", "script_path" : "menu/coremenurenderer.lua"},
+        {"hook_id" : "lib/managers/menu/renderers/menunodereticleswitchgui", "script_path" : "menubase.lua"},
+        {"hook_id" : "core/lib/managers/menu/reference_renderer/coremenunodegui", "script_path" : "menu/coremenunodegui.lua"}
     ]
 }

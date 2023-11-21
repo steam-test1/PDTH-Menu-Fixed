@@ -4,10 +4,7 @@ HUDLootScreen = HUDLootScreen or class()
 function HUDLootScreen:init(hud, workspace, saved_lootdrop, saved_selected, saved_chosen, saved_setup)
 	self._backdrop = MenuBackdropGUI:new(workspace)
 	self._backdrop:create_black_borders()
-	local get_texture
-	if PDTH_Menu.options.enable_pdth_endscreen_texture then
-		self._backdrop:set_bg("PDTHMenu/seven_figures_logo")
-	end
+	self._backdrop:set_bg("guis/textures/seven_figures_logo")
 	self._active = false
 	self._hud = hud
 	self._workspace = workspace
@@ -107,21 +104,14 @@ function HUDLootScreen:init(hud, workspace, saved_lootdrop, saved_selected, save
 	local panel = self._peers_panel:child("peer" .. tostring(local_peer_id))
 	local peer_info_panel = panel:child("peer_info")
 	local peer_name = peer_info_panel:child("peer_name")
-	local peer_name_string = tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name())
-	local color_range_offset = utf8.len(peer_name_string) + 2
-	local experience, color_ranges = managers.experience:gui_string(managers.experience:current_level(), managers.experience:current_rank(), color_range_offset)
-
-	peer_name:set_text(peer_name_string .. " (" .. experience .. ")")
-
-	for _, color_range in ipairs(color_ranges or {}) do
-		peer_name:set_range_color(color_range.start, color_range.stop, color_range.color)
-	end
+	local experience = (managers.experience:current_rank() > 0 and managers.experience:rank_string(managers.experience:current_rank()) .. "-" or "") .. managers.experience:current_level()
+	peer_name:set_text(tostring(managers.network.account:username() or managers.blackmarket:get_preferred_character_real_name()) .. " (" .. experience .. ")")
 	self:make_fine_text(peer_name)
 	peer_name:set_right(peer_info_panel:w())
 	if managers.experience:current_rank() > 0 then
 		peer_info_panel:child("peer_infamy"):set_visible(true)
 		peer_info_panel:child("peer_infamy"):set_right(peer_name:x())
-		peer_info_panel:child("peer_infamy"):set_top(peer_name:y() + 4)
+		peer_info_panel:child("peer_infamy"):set_top(peer_name:y())
 	else
 		peer_info_panel:child("peer_infamy"):set_visible(false)
 	end
@@ -173,8 +163,8 @@ function HUDLootScreen:create_peer(peers_panel, peer_id)
 	local peer_infamy = peer_info_panel:bitmap({
 		name = "peer_infamy",
 		w = 16,
-		h = 16,
-		y = 4,
+		h = 32,
+		texture = infamy_icon,
 		visible = false,
 		color = color
 	})

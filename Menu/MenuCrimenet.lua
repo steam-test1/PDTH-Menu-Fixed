@@ -6,6 +6,7 @@ local make_fine_text = function(text)
 	text:set_position(math.round(text:x()), math.round(text:y()))
 end
 
+CloneClass(MenuNodeGui)
 function MenuNodeCrimenetGui:init(node, layer, parameters)
 	parameters.font = tweak_data.menu.pd2_small_font
 	parameters.font_size = tweak_data.menu.pd2_small_font_size
@@ -19,7 +20,7 @@ function MenuNodeCrimenetGui:init(node, layer, parameters)
 	MenuNodeCrimenetGui.super.init(self, node, layer, parameters)
 end
 
-MenuNodeCrimenetFiltersGui = MenuNodeCrimenetFiltersGui or class(CoreMenuNodeGui.NodeGui)
+MenuNodeCrimenetFiltersGui = MenuNodeCrimenetFiltersGui or class(MenuNodeGui)
 function MenuNodeCrimenetFiltersGui:init(node, layer, parameters)
 	parameters.font = tweak_data.menu.pd2_small_font
 	parameters.font_size = tweak_data.menu.pd2_small_font_size
@@ -55,7 +56,7 @@ function MenuNodeCrimenetSpecialGui:_setup_item_panel(safe_rect, res)
 	title_text:set_bottom(self.box_panel:top())
 end
 
-MenuNodeCrimenetCasinoGui = MenuNodeCrimenetCasinoGui or class(CoreMenuNodeGui.NodeGui)
+MenuNodeCrimenetCasinoGui = MenuNodeCrimenetCasinoGui or class(MenuNodeGui)
 function MenuNodeCrimenetCasinoGui:init(node, layer, parameters)
 	parameters.font = tweak_data.menu.pd2_small_font
 	parameters.font_size = tweak_data.menu.pd2_small_font_size
@@ -549,7 +550,7 @@ function MenuNodeCrimenetCasinoGui:set_update_values(preferred_card, secured_car
 end
 
 
-MenuNodeCrimenetContactInfoGui = MenuNodeCrimenetContactInfoGui or class(CoreMenuNodeGui.NodeGui)
+MenuNodeCrimenetContactInfoGui = MenuNodeCrimenetContactInfoGui or class(MenuNodeGui)
 MenuNodeCrimenetContactInfoGui.WIDTH = 600
 MenuNodeCrimenetContactInfoGui.HEIGHT = 465
 MenuNodeCrimenetContactInfoGui.MENU_WIDTH = 220
@@ -1885,7 +1886,7 @@ function MenuNodeChooseWeaponRewardGui:_setup_item_panel(safe_rect, res)
 		self.item_panel:set_y(static_y)
 	end
 	self.item_panel:set_position(math.round(self.item_panel:x()), math.round(self.item_panel:y()))
-	-- self:_rec_round_object(self.item_panel)
+	self:_rec_round_object(self.item_panel)
 	if alive(self.box_panel) then
 		self.item_panel:parent():remove(self.box_panel)
 		self.box_panel = nil

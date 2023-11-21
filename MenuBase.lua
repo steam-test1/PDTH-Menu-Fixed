@@ -4,42 +4,38 @@ PDTH_Menu.dofiles = {
    "MenuOptions.lua"
 }
 PDTH_Menu.hook_files = {
-    ["lib/managers/menu/items/menuitemmultichoice"] = "Menu/menumultichoice.lua",
-    ["lib/managers/menu/items/menuitemcustomizecontroller"] = "Menu/menuitemcustomizecontroller.lua",
-    ["lib/managers/menu/blackmarketgui"] = "Menu/blackmarketgui.lua",
-    ["lib/managers/menu/renderers/menunodebasegui"] = "Menu/menunodebasegui.lua",
-    ["lib/managers/menu/textboxgui"] = "Menu/textboxgui.lua",
-    ["lib/managers/menu/renderers/menunodepreplanninggui"] = "Menu/menupreplanning.lua",
-    ["lib/managers/menu/renderers/menunodecrimenetgui"] = "Menu/menucrimenet.lua",
-    ["lib/managers/menu/renderers/menunodetablegui"] = "Menu/menunodetablegui.lua",
-    ["lib/managers/menu/menurenderer"] = "Menu/menurenderer.lua",
-    ["lib/managers/menu/imageboxgui"] = "Menu/imageboxgui.lua",
-    ["lib/managers/menu/menulobbyrenderer"] = "Menu/menulobbyrenderer.lua",
-    ["lib/managers/menu/renderers/menunodejukeboxgui"] = "Menu/menunodejukeboxgui.lua",
-    ["lib/managers/menu/newsfeedgui"] = "Menu/newsfeedgui.lua",
-    ["lib/managers/menu/renderers/menunodeskillswitchgui"] = "Menu/menunodeskillswitchgui.lua",
-    ["lib/managers/menu/renderers/menunodeupdatesgui"] = "Menu/menunodeupdatesgui.lua",
-    ["lib/managers/menu/menupauserenderer"] = "Menu/menupause.lua",
-    ["lib/managers/menu/lootdropscreengui"] = "Menu/lootdropscreengui.lua",
-    ["lib/managers/hud/hudmissionbriefing"] = "Menu/hudmissionbriefing.lua",
-    ["lib/managers/menu/infamytreegui"] = "Menu/infamytreegui.lua",
-    ["lib/managers/hud/hudstageendscreen"] = "Menu/hudstageendscreen.lua",
-    ["lib/managers/menu/playerinventorygui"] = "Menu/playerinventorygui.lua",
-    ["lib/managers/hud/hudlootscreen"] = "Menu/hudlootscreen.lua",
-    ["lib/managers/menu/menunodegui"] = "Menu/menunodegui.lua",
-    ["lib/managers/menu/menubackdropgui"] = "Menu/menubackdropgui.lua",
-    ["lib/managers/menu/menukitrenderer"] = "Menu/menukit.lua",
-    -- ["lib/managers/menu/skilltreegui"] = "Menu/skilltreegui.lua",
-    ["lib/managers/menu/stageendscreengui"] = "Menu/stageendscreengui.lua",
-    ["lib/managers/menumanager"] = "Menu/menumanager.lua",
-    ["lib/managers/menu/missionbriefinggui"] = "Menu/missionbriefinggui.lua",
-    ["lib/managers/crimenetmanager"] = "Menu/crimenetmanager.lua",
-    ["lib/managers/chatmanager"] = "Menu/chatmanager.lua",
-    ["lib/managers/menu/menuinput"] = "Menu/menuinput.lua",
-    ["lib/managers/social_hub/lobbycodemenucomponent"] = "Menu/lobbycodemenucomponent.lua",
-    ["lib/managers/menu/crimespreedetailsmenucomponent"] = "Menu/crimespreedetailsmenucomponent.lua",
-    ["lib/managers/menu/menucomponentmanager"] = "Menu/menucomponentmanager.lua"
-    -- ["lib/managers/menu/crimespreemissionendoptions"] = "Menu/crimespreemissionendoptions.lua", 
+    ["lib/managers/menu/items/menuitemmultichoice"] = "menu/menumultichoice.lua",
+    ["lib/managers/menu/items/menuitemcustomizecontroller"] = "menu/menuitemcustomizecontroller.lua",
+    ["lib/managers/menu/blackmarketgui"] = "menu/blackmarketgui.lua",
+    ["lib/managers/menu/renderers/menunodebasegui"] = "menu/menunodebasegui.lua",
+    ["lib/managers/menu/textboxgui"] = "menu/textboxgui.lua",
+    ["lib/managers/menu/renderers/menunodepreplanninggui"] = "menu/menupreplanning.lua",
+    ["lib/managers/menu/renderers/menunodecrimenetgui"] = "menu/menucrimenet.lua",
+    ["lib/managers/menu/renderers/menunodetablegui"] = "menu/menunodetablegui.lua",
+    ["lib/managers/menu/menurenderer"] = "menu/menurenderer.lua",
+    ["lib/managers/menu/imageboxgui"] = "menu/imageboxgui.lua",
+    ["lib/managers/menu/menulobbyrenderer"] = "menu/menulobbyrenderer.lua",
+    ["lib/managers/menu/renderers/menunodejukeboxgui"] = "menu/menunodejukeboxgui.lua",
+    ["lib/managers/menu/newsfeedgui"] = "menu/newsfeedgui.lua",
+    ["lib/managers/menu/renderers/menunodeskillswitchgui"] = "menu/menunodeskillswitchgui.lua",
+    ["lib/managers/menu/renderers/menunodeupdatesgui"] = "menu/menunodeupdatesgui.lua",
+    ["lib/managers/menu/menupauserenderer"] = "menu/menupause.lua", 
+    ["lib/managers/menu/lootdropscreengui"] = "menu/lootdropscreengui.lua", 
+    ["lib/managers/hud/hudmissionbriefing"] = "menu/hudmissionbriefing.lua", 
+    ["lib/managers/menu/infamytreegui"] = "menu/infamytreegui.lua",
+    ["lib/managers/hud/hudstageendscreen"] = "menu/hudstageendscreen.lua", 
+    ["lib/managers/menu/playerinventorygui"] = "menu/playerinventorygui.lua",
+    ["lib/managers/hud/hudlootscreen"] = "menu/hudlootscreen.lua", 
+    ["lib/managers/menu/menunodegui"] = "menu/menunodegui.lua",
+    ["lib/managers/menu/menubackdropgui"] = "menu/menubackdropgui.lua",
+    ["lib/managers/menu/menukitrenderer"] = "menu/menukit.lua",
+    ["lib/managers/menu/skilltreegui"] = "menu/skilltreegui.lua",
+    ["lib/managers/menu/stageendscreengui"] = "menu/stageendscreengui.lua",
+    ["lib/managers/menumanager"] = "menu/menumanager.lua", 
+    ["lib/managers/menu/missionbriefinggui"] = "menu/missionbriefinggui.lua", 
+    ["lib/managers/crimenetmanager"] = "menu/crimenetmanager.lua", 
+    ["lib/managers/chatmanager"] = "menu/chatmanager.lua", 
+    ["lib/managers/menu/renderers/menunodereticleswitchgui"] = "menu/menunodereticleswitchgui.lua"
 }
 
 if not PDTH_Menu.setup and Hooks then
@@ -48,13 +44,13 @@ if not PDTH_Menu.setup and Hooks then
 	end
 	PDTH_Menu.colors = {
 		 {color = ColorRGB(255,165 ,0 ), menu_name = "Orange"},
-	 	 {color = ColorRGB(255, 255, 255), menu_name = "White"},
+	 	 {color = ColorRGB(255, 255, 255), menu_name = "White"},	 		
 		 {color = ColorRGB(0, 0, 0), menu_name = "Black"},
-		 {color = ColorRGB(0 ,150 ,255 ), menu_name = "Blue"},
-		 {color = ColorRGB(0, 255, 20), menu_name = "Green"},
-		 {color = ColorRGB(255, 105, 180), menu_name = "Pink"},
-	}
-    PDTH_Menu.lobby_icon_unknown = {100,197, 48, 48}
+		 {color = ColorRGB(0 ,150 ,255 ), menu_name = "Blue"},	  	 
+		 {color = ColorRGB(0, 255, 20), menu_name = "Green"},	
+		 {color = ColorRGB(255, 105, 180), menu_name = "Pink"},				 
+	}    
+    PDTH_Menu.lobby_icon_unknown = {197,197, 48, 48}
     PDTH_Menu.lobby_icon_russian = {1, 1, 48, 48}
     PDTH_Menu.lobby_icon_german = {49, 1, 48, 48}
     PDTH_Menu.lobby_icon_american = {100, 1, 48, 48}
@@ -68,15 +64,7 @@ if not PDTH_Menu.setup and Hooks then
     PDTH_Menu.lobby_icon_sokol = {1, 100, 48, 48}
     PDTH_Menu.lobby_icon_dragon = {49,100, 48, 48}
     PDTH_Menu.lobby_icon_bodhi = {100,100, 48, 48}
-    PDTH_Menu.lobby_icon_jimmy = {149,100, 48, 48}
-    PDTH_Menu.lobby_icon_sydney = {198,100, 48, 48}
-    PDTH_Menu.lobby_icon_wild = {1,148, 48, 48}
-    PDTH_Menu.lobby_icon_max = {50,148, 48, 48}
-    PDTH_Menu.lobby_icon_chico = {100,148, 48, 48}
-    PDTH_Menu.lobby_icon_myh = {149,148, 48, 48}
-    PDTH_Menu.lobby_icon_ecp_male = {198,148, 48, 48}
-    PDTH_Menu.lobby_icon_ecp_female = {1,197, 48, 48}
-    PDTH_Menu.lobby_icon_joy = {49,198, 48, 48}
+
 
     PDTH_Menu.level_image_jewelry_store = {0,0,480,270}
     PDTH_Menu.level_image_ukrainian_job = {0,0,480,270}
@@ -118,7 +106,7 @@ if not PDTH_Menu.setup and Hooks then
     PDTH_Menu.level_image_red2 = {1920,810,480,270}
     PDTH_Menu.level_image_pbr2 = {2400,810,480,270}
     PDTH_Menu.level_image_pbr = {2880,810,480,270}
-    PDTH_Menu.level_image_firestarter_1 = {3360,810,480,270}
+    PDTH_Menu.level_image_firestarter_1 = {3360,810,480,270} 
 
     PDTH_Menu.level_image_kenaz = {0,1080,480,270}
     PDTH_Menu.level_image_mia = {480,1080,480,270}
@@ -127,7 +115,7 @@ if not PDTH_Menu.setup and Hooks then
     PDTH_Menu.level_image_nail = {1920,1080,480,270}
     PDTH_Menu.level_image_cane = {2400,1080,480,270}
     PDTH_Menu.level_image_dinner = {2880,1080,480,270}
-    PDTH_Menu.level_image_mus = {3360,1080,480,270}
+    PDTH_Menu.level_image_mus = {3360,1080,480,270}    
 
 
     PDTH_Menu.level_image_watchdogs_1 = {0,1350,480,270}
@@ -152,14 +140,14 @@ if not PDTH_Menu.setup and Hooks then
 	end
 	for k, v in pairs(PDTH_Menu.options) do
 		if k:match("color") and type(v) == "number" and v > #PDTH_Menu.colors then
-			PDTH_Menu.options[k] = #PDTH_Menu.colors
+			PDTH_Menu.options[k] = #PDTH_Menu.colors	
 		end
 	end
     PDTHMenu_color_normal = PDTH_Menu.colors[PDTH_Menu.options.PDTH_Menucolor].color
     PDTHMenu_color_highlight = PDTH_Menu.colors[PDTH_Menu.options.pdth_highlightcolor].color
     PDTHMenu_color_marker = PDTH_Menu.colors[PDTH_Menu.options.pdth_markercolor].color
-    PDTHMenu_font = PDTH_Menu.options.font_enable and "fonts/pdth_menu_font" or "fonts/font_medium_mf"
-    PDTHMenu_font_size = PDTH_Menu.options.font_enable and 16 or 19
+    PDTHMenu_font = PDTH_Menu.options.font_enable and "fonts/font_small_shadow_mf" or "fonts/font_medium_mf"
+    PDTHMenu_font_size = PDTH_Menu.options.font_enable and 17 or 19
 	PDTHMenu_align = "left" --Not recommended to change might cause issues.
  	log("[PDTH Menu] Done loading all options")
 	PDTH_Menu.setup = true
@@ -172,3 +160,4 @@ if RequiredScript then
 		dofile( ModPath .. PDTH_Menu.hook_files[requiredScript] )
 	end
 end
+  

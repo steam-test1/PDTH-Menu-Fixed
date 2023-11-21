@@ -8,36 +8,24 @@ function MenuRenderer:show_node( node )
 		gui_class = CoreSerialize.string_to_classtable( node:parameters().gui_class )
 	end
 	local alignment
-	local exclude = {
-		-- "jukebox_menu_tracks",
-		"jukebox_menu_playlist",
-		-- "jukebox_heist_tracks",
-		"jukebox_heist_playlist",
-		-- "jukebox_ghost_tracks",
-		"jukebox_ghost_playlist",
-		-- "blackmarket_reticle_switch",
-		-- "blackmarket_customize_gadget",
-		"pdth_hud_active_challenges",
-		"pdth_hud_completed_challenges"
-	}
-    if node:parameters().name ==  exclude then
-   		alignment = "right"
-    else
-   		alignment = "left"
-    end
-	local parameters = {
+	if node:parameters().name == "jukebox_menu_playlist" or node:parameters().name == "jukebox_heist_playlist" or node:parameters().name == "jukebox_ghost_playlist" or node:parameters().name == "base_lua_mods_menu" then
+		alignment = "right"
+	else
+		alignment = "left"
+	end
+	local parameters = { 	
 		font = PDTHMenu_font,
 		row_item_color = PDTHMenu_color_normal,
-		row_item_hightlight_color = PDTHMenu_color_highlight,
+		row_item_hightlight_color = PDTHMenu_color_highlight, 
 		row_item_blend_mode = "normal",
 		font_size = PDTHMenu_font_size,
-		node_gui_class = gui_class,
+		node_gui_class = gui_class, 
 		marker_alpha = 1,
 		marker_color = PDTHMenu_color_marker,
 		align = alignment,
 		to_upper = true,
 		spacing = node:parameters().spacing
-	}
+	} 
 	MenuRenderer.super.show_node( self, node, parameters )
 end
 
@@ -53,7 +41,7 @@ end
 function MenuRenderer:_create_framing()
 	MenuRenderer._create_bottom_text( self )
 end
-function MenuRenderer:setup_frames_and_logo()
+function MenuRenderer:setup_frames_and_logo() 
 	 self._upper_frame_gradient = self._fullscreen_panel:rect({
 		x = 0,
 		y = 0,
@@ -75,7 +63,7 @@ function MenuRenderer:setup_frames_and_logo()
 		texture = tweak_data.load_level.stonecold_small_logo,
 		layer = 2,
 		h = 56
-	})
+	})	
 
 end
 
@@ -91,28 +79,30 @@ function MenuRenderer:layout_frames_and_logo()
 
 	self._pd2_logo:set_size(256, 56)
 	self._pd2_logo:set_bottom(75)
-	self._pd2_logo:set_right(self._fullscreen_panel:right() - 30)
+	self._pd2_logo:set_right(self._fullscreen_panel:right() - 30)		
 end
 function MenuRenderer:_create_bottom_text()
 	local scaled_size = managers.gui_data:scaled_size()
-	self._top_text = self._main_panel:text({
+	self._top_text = self._main_panel:text({ 
 		text = "",
 		font = PDTHMenu_font,
 		font_size = PDTHMenu_font_size + 4,
 		align= PDTHMenu_align,
+		align = "left",
 		halign = "top",
 		vertical = "top",
 		w = scaled_size.width*0.66,
 		layer = 2,
-	})
-	self._bottom_text = self._main_panel:text({
+	})	
+	self._bottom_text = self._main_panel:text({ 
 		text = "",
-		wrap = true, word_wrap = true,
+		wrap = false, 
+		word_wrap = false,
 		font = PDTHMenu_font,
 		font_size = PDTHMenu_font_size,
 		align= PDTHMenu_align,
-		halign="left",
-		vertical="top",
+		halign="left", 
+		vertical="top", 
 		hvertical="top",
 		w = scaled_size.width*0.66,
 		layer = 2,

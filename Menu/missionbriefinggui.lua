@@ -1,5 +1,4 @@
 require("lib/managers/menu/WalletGuiObject")
-require("lib/managers/social_hub/LobbyCodeMenuComponent")
 local make_fine_text = function(text)
 	local x, y, w, h = text:text_rect()
 	text:set_size(w, h)
@@ -42,7 +41,6 @@ function MissionBriefingTabItem:init(panel, text, i)
 	self._selected = true
 	self:deselect()
 end
-
 function MissionBriefingTabItem:reduce_to_small_font(iteration)
 	iteration = iteration or 0
 	local font_size = tweak_data.menu.pd2_small_font_size - iteration
@@ -61,7 +59,6 @@ function MissionBriefingTabItem:reduce_to_small_font(iteration)
 	self._panel:set_h(self._main_panel:h())
 	self._panel:grow(0, -(self._panel:top() + 70 + tweak_data.menu.pd2_small_font_size * 4 + 25))
 end
-
 function MissionBriefingTabItem:update_tab_position()
 	local prev_item_title_text = self._main_panel:child("tab_text_" .. tostring(self._index - 1))
 	local offset = prev_item_title_text and prev_item_title_text:right() or 0
@@ -165,23 +162,16 @@ function MissionBriefingTabItem.animate_deselect(o, center_helper)
 		o:set_center(center_x, center_y)
 	end)
 end
-
+DescriptionItem = DescriptionItem or class(MissionBriefingTabItem)
 function DescriptionItem:init(panel, text, i, saved_descriptions)
 	DescriptionItem.super.init(self, panel, text, i)
-
 	if not managers.job:has_active_job() then
 		return
 	end
-
 	local stage_data = managers.job:current_stage_data()
 	local level_data = managers.job:current_level_data()
 	local name_id = stage_data.name_id or level_data.name_id
 	local briefing_id = managers.job:current_briefing_id()
-
-	if managers.skirmish:is_skirmish() and not managers.skirmish:is_weekly_skirmish() then
-		briefing_id = "heist_skm_random_briefing"
-	end
-
 	local title_text = self._panel:text({
 		name = "title_text",
 		text = managers.localization:to_upper_text(name_id),
@@ -246,7 +236,7 @@ function DescriptionItem:reduce_to_small_font()
 	end
 	local desc_text = self._scroll_panel:child("description_text")
 	local title_text = self._panel:child("title_text")
-	self._scroll_panel:set_h(350)
+	self._scroll_panel:set_h(self._panel:h())
 	self._scroll_panel:set_y(title_text:bottom())
 	self._scroll_panel:grow(0, -self._scroll_panel:y())
 	local show_scroll_line_top = 0 > desc_text:top()
@@ -366,16 +356,14 @@ function DescriptionItem:update(t, dt)
 		local show_scroll_line_top = 0 > desc_text:top()
 		local show_scroll_line_bottom = desc_text:bottom() > self._scroll_panel:h()
 		if show_scroll_line_top ~= self._show_scroll_line_top or show_scroll_line_bottom ~= self._show_scroll_line_bottom then
-			if self._scroll_box then
-				self._scroll_box:create_sides(self._scroll_panel, {
-					sides = {
-						0,
-						0,
-						0,
-						0
-					}
-				})
-			end
+			self._scroll_box:create_sides(self._scroll_panel, {
+				sides = {
+					0,
+					0,
+					0,
+					0
+				}
+			})
 			self._show_scroll_line_top = show_scroll_line_top
 			self._show_scroll_line_bottom = show_scroll_line_bottom
 		end
@@ -441,7 +429,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 		if not assets_names[i][3] then
 			local lock = self._panel:bitmap({
 				name = "asset_lock_" .. tostring(i),
-				texture = managers.assets:get_asset_can_unlock_by_id(self._assets_names[i][4]) and "guis/textures/pd2/blackmarket/money_lock" or "guis/textures/pd2/skilltree/padlock",
+				texture = assets_names[i][5] and "guis/textures/pd2/blackmarket/money_lock" or "guis/textures/pd2/skilltree/padlock",
 				color = tweak_data.screen_colors.item_stage_1,
 				layer = 3
 			})
@@ -454,7 +442,7 @@ function AssetsItem:create_assets(assets_names, max_assets)
 	self._text_strings_localized = false
 	self._my_asset_space = w
 	self._my_left_i = self._my_menu_component_data.my_left_i or 1
-	if math.ceil(#self._assets_list / self._num_items) > 1 then
+	if 1 < math.ceil(#self._assets_list / self._num_items) then
 		self._move_left_rect = self._panel:bitmap({
 			texture = "guis/textures/pd2/hud_arrow",
 			color = tweak_data.screen_colors.button_stage_3,
@@ -485,8 +473,6 @@ function AssetsItem:create_assets(assets_names, max_assets)
 		}
 		if managers.preplanning:has_current_level_preplanning() then
 			table.insert(legends, 1, "menu_legend_open_preplanning")
-		else
-			table.insert(legends, 1, "menu_legend_buy_all_assets")
 		end
 		local t_text = ""
 		for i, string_id in ipairs(legends) do
@@ -520,25 +506,6 @@ function AssetsItem:create_assets(assets_names, max_assets)
 		})
 	end
 	self:post_init()
-
-	self._is_buy_all_dialog_open = false
-
-	if not managers.preplanning:has_current_level_preplanning() and managers.menu:is_pc_controller() then
-		self.buy_all_button = self._panel:text({
-			name = "buy_all_btn",
-			align = "right",
-			blend_mode = "add",
-			visible = true,
-			text = managers.localization:to_upper_text("menu_asset_buy_all_button"),
-			h = tweak_data.menu.pd2_medium_font_size * 0.95,
-			font_size = tweak_data.menu.pd2_medium_font_size * 0.9,
-			font = tweak_data.menu.pd2_medium_font,
-			color = tweak_data.screen_colors.button_stage_3
-		})
-
-		self.buy_all_button:set_top(10)
-		self.buy_all_button:set_right(self._panel:w() - 5)
-	end
 end
 function AssetsItem:unlock_asset_by_id(id)
 	for i, asset_data in ipairs(self._assets_names) do
@@ -645,7 +612,7 @@ function AssetsItem:select_asset(i, instant)
 	if self._asset_locked[i] then
 		local can_client_unlock = managers.assets.ALLOW_CLIENTS_UNLOCK == true or type(managers.assets.ALLOW_CLIENTS_UNLOCK) == "string" and managers.player:has_team_category_upgrade("player", managers.assets.ALLOW_CLIENTS_UNLOCK)
 		local is_server = Network:is_server() or can_client_unlock
-		local can_unlock = managers.assets:get_asset_can_unlock_by_id(self._assets_names[i][4])
+		local can_unlock = self._assets_names[i][5]
 		if not self._assets_names[i][6] or not text_string then
 			text_string = managers.localization:text("bm_menu_mystery_asset")
 		end
@@ -770,19 +737,6 @@ function AssetsItem:mouse_moved(x, y)
 			preplanning:child("button"):set_alpha(0.8)
 		end
 	end
-	if alive(self.buy_all_button) and self.buy_all_button:inside(x, y) then
-		if not self.buy_all_button_highlighted then
-			self.buy_all_button_highlighted = true
-
-			self.buy_all_button:set_color(tweak_data.screen_colors.button_stage_2)
-			managers.menu_component:post_event("highlight")
-			self:check_deselect_item()
-		end
-	elseif self.buy_all_button_highlighted then
-		self.buy_all_button_highlighted = false
-
-		self.buy_all_button:set_color(tweak_data.screen_colors.button_stage_3)
-	end
 	local selected, highlighted = AssetsItem.super.mouse_moved(self, x, y)
 	if not self._panel:inside(x, y) or not selected then
 		self:check_deselect_item()
@@ -829,83 +783,90 @@ function AssetsItem:mouse_pressed(button, x, y)
 		self:open_preplanning()
 		return
 	end
-	if alive(self.buy_all_button) and self.buy_all_button:inside(x, y) then
-		self:open_assets_buy_all()
-
-		return
-	end
 	if self._asset_selected and alive(self._panel:child("bg_rect_" .. tostring(self._asset_selected))) and self._panel:child("bg_rect_" .. tostring(self._asset_selected)):inside(x, y) then
 		return self:_return_asset_info(self._asset_selected)
 	end
 	return inside
 end
--- function AssetsItem:open_preplanning()
--- 	if self._preplanning_ready then
--- 		managers.menu_component:post_event("menu_enter")
--- 		managers.menu:open_node("preplanning")
--- 		managers.menu_component:on_ready_pressed_mission_briefing_gui(false)
--- 	end
--- end
--- function AssetsItem:move(x, y)
--- 	if #self._assets_list == 0 then
--- 		return
--- 	end
--- 	local asset_selected = self._asset_selected
--- 	local new_selected = self._my_left_i and (self._my_left_i - 1) * self._num_items + 1 or 1
--- 	if asset_selected then
--- 		local is_top = 0 < asset_selected % 2
--- 		if not is_top or not math.max(y, 0) then
--- 		end
--- 		local step = 2 * x + math.min(y, 0)
--- 		new_selected = asset_selected + step
--- 		if new_selected > #self._assets_list then
--- 			local old_page = math.ceil(asset_selected / self._num_items)
--- 			local new_page = math.ceil(new_selected / self._num_items)
--- 			if old_page < new_page then
--- 				new_selected = #self._assets_list
--- 			end
--- 		end
--- 	end
--- 	if new_selected >= 1 and new_selected <= #self._assets_list then
--- 		self._asset_selected = asset_selected
--- 		self:select_asset(new_selected)
--- 	end
--- end
--- function AssetsItem:move_left()
--- 	self:move(-1, 0)
--- 	do return end
--- 	if #self._assets_list == 0 then
--- 		return
--- 	end
--- 	self._asset_selected = self._asset_selected or 0
--- 	local new_selected = math.max(self._asset_selected - 1, 1)
--- 	self:select_asset(new_selected)
--- 	return
--- end
--- function AssetsItem:move_up()
--- 	self:move(0, -1)
--- end
--- function AssetsItem:move_down()
--- 	self:move(0, 1)
--- end
--- function AssetsItem:move_right()
--- 	self:move(1, 0)
--- 	do return end
--- 	if #self._assets_list == 0 then
--- 		return
--- 	end
--- 	self._asset_selected = self._asset_selected or 0
--- 	local new_selected = math.min(self._asset_selected + 1, #self._assets_list)
--- 	self:select_asset(new_selected)
--- 	return
--- end
--- function AssetsItem:confirm_pressed()
--- 	return self:_return_asset_info(self._asset_selected)
--- end
--- function AssetsItem:something_selected()
--- 	return self._asset_selected and true or false
--- end
-
+function AssetsItem:open_preplanning()
+	if self._preplanning_ready then
+		managers.menu_component:post_event("menu_enter")
+		managers.menu:open_node("preplanning")
+		managers.menu_component:on_ready_pressed_mission_briefing_gui(false)
+	end
+end
+function AssetsItem:move(x, y)
+	if #self._assets_list == 0 then
+		return
+	end
+	local asset_selected = self._asset_selected
+	local new_selected = self._my_left_i and (self._my_left_i - 1) * self._num_items + 1 or 1
+	if asset_selected then
+		local is_top = 0 < asset_selected % 2
+		if not is_top or not math.max(y, 0) then
+		end
+		local step = 2 * x + math.min(y, 0)
+		new_selected = asset_selected + step
+		if new_selected > #self._assets_list then
+			local old_page = math.ceil(asset_selected / self._num_items)
+			local new_page = math.ceil(new_selected / self._num_items)
+			if old_page < new_page then
+				new_selected = #self._assets_list
+			end
+		end
+	end
+	if new_selected >= 1 and new_selected <= #self._assets_list then
+		self._asset_selected = asset_selected
+		self:select_asset(new_selected)
+	end
+end
+function AssetsItem:move_left()
+	self:move(-1, 0)
+	do return end
+	if #self._assets_list == 0 then
+		return
+	end
+	self._asset_selected = self._asset_selected or 0
+	local new_selected = math.max(self._asset_selected - 1, 1)
+	self:select_asset(new_selected)
+	return
+end
+function AssetsItem:move_up()
+	self:move(0, -1)
+end
+function AssetsItem:move_down()
+	self:move(0, 1)
+end
+function AssetsItem:move_right()
+	self:move(1, 0)
+	do return end
+	if #self._assets_list == 0 then
+		return
+	end
+	self._asset_selected = self._asset_selected or 0
+	local new_selected = math.min(self._asset_selected + 1, #self._assets_list)
+	self:select_asset(new_selected)
+	return
+end
+function AssetsItem:confirm_pressed()
+	return self:_return_asset_info(self._asset_selected)
+end
+function AssetsItem:something_selected()
+	return self._asset_selected and true or false
+end
+function AssetsItem:_return_asset_info(i)
+	local asset_cost
+	if self._asset_locked[i] then
+		local can_unlock = self._assets_names[i][5] and managers.money:can_afford_mission_asset(self._assets_names[i][4])
+		local can_client_unlock = managers.assets.ALLOW_CLIENTS_UNLOCK == true or type(managers.assets.ALLOW_CLIENTS_UNLOCK) == "string" and managers.player:has_team_category_upgrade("player", managers.assets.ALLOW_CLIENTS_UNLOCK)
+		if (Network:is_server() or can_client_unlock) and can_unlock then
+			asset_cost = managers.money:get_mission_asset_cost_by_id(self._assets_names[i][4])
+		else
+			asset_cost = true
+		end
+	end
+	return i, asset_cost
+end
 function LoadoutItem:init(panel, text, i, assets_names, menu_component_data)
 	LoadoutItem.super.init(self, panel, text, i, assets_names, 5, menu_component_data, true)
 	self._text_strings_localized = true
@@ -1480,12 +1441,11 @@ function LoadoutItem.animate_deselect(o, center_helper, instant)
 end
 TeamLoadoutItem = TeamLoadoutItem or class(MissionBriefingTabItem)
 function TeamLoadoutItem:init(panel, text, i)
-	local num_player_slots = BigLobbyGlobals and BigLobbyGlobals:num_player_slots() or tweak_data.max_players
 	TeamLoadoutItem.super.init(self, panel, text, i)
 	self._player_slots = {}
 	local quarter_width = self._panel:w() / 4
 	local slot_panel
-	for i = 1, num_player_slots do
+	for i = 1, 4 do
 		local old_right = slot_panel and slot_panel:right() or 0
 		slot_panel = self._panel:panel({
 			x = old_right,
@@ -1510,13 +1470,9 @@ function TeamLoadoutItem:init(panel, text, i)
 		end
 	end
 end
-
-function TeamLoadoutItem:reduce_to_small_font(iteration)
-	TeamLoadoutItem.super.reduce_to_small_font(self, iteration)
-
-	local num_player_slots = BigLobbyGlobals and BigLobbyGlobals:num_player_slots() or tweak_data.max_players
-
-	for i = 1, num_player_slots do
+function TeamLoadoutItem:reduce_to_small_font()
+	TeamLoadoutItem.super.reduce_to_small_font(self)
+	for i = 1, 4 do
 		if self._player_slots[i].box then
 			self._player_slots[i].box:create_sides(self._player_slots[i].panel, {
 				sides = {
@@ -1577,335 +1533,6 @@ function MutatorsItem:init(panel, text, i)
 		mutator_text:set_size(w, h)
 		_y = mutator_text:bottom() + 2
 	end
-end
-
-CrimeSpreeModifierItem = CrimeSpreeModifierItem or class(MissionBriefingTabItem)
-
-function CrimeSpreeModifierItem:init(panel, text, i, cs_modifiers_tab)
-	CrimeSpreeModifierItem.super.init(self, panel, text, i)
-
-	if not managers.job:has_active_job() then
-		return
-	end
-
-	local stage_data = managers.job:current_stage_data()
-	local level_data = managers.job:current_level_data()
-	local name_id = stage_data.name_id or level_data.name_id
-	local briefing_id = managers.crime_spree:active_modifiers()
-
-	if managers.skirmish:is_skirmish() and not managers.skirmish:is_weekly_skirmish() then
-		briefing_id = "heist_skm_random_briefing"
-	end
-
-	local title_text = self._panel:text({
-		name = "title_text",
-		y = 10,
-		x = 10,
-		text = managers.localization:to_upper_text(name_id),
-		font_size = tweak_data.menu.pd2_medium_font_size,
-		font = tweak_data.menu.pd2_medium_font,
-		color = tweak_data.screen_colors.text
-	})
-	local x, y, w, h = title_text:text_rect()
-
-	title_text:set_size(w, h)
-	title_text:set_position(math.round(title_text:x()), math.round(title_text:y()))
-
-	local pro_text = nil
-
-	if managers.job:is_current_job_professional() then
-		pro_text = self._panel:text({
-			name = "pro_text",
-			blend_mode = "add",
-			text = managers.localization:to_upper_text("cn_menu_pro_job"),
-			font_size = tweak_data.menu.pd2_medium_font_size,
-			font = tweak_data.menu.pd2_medium_font,
-			color = tweak_data.screen_colors.pro_color
-		})
-		local x, y, w, h = pro_text:text_rect()
-
-		pro_text:set_size(w, h)
-		pro_text:set_position(title_text:right() + 10, title_text:y())
-	end
-
-	self._scroll_panel = self._panel:panel({
-		x = 10,
-		y = title_text:bottom()
-	})
-
-	self._scroll_panel:grow(-self._scroll_panel:x() - 10, -self._scroll_panel:y())
-
-	local upcoming_modifiers_text = ""
-
-	for i, category in ipairs({
-		"forced",
-		"loud",
-		"stealth"
-	}) do
-		local next_level = managers.crime_spree:next_modifier_level(category)
-
-		if next_level then
-			local text_id = "menu_cs_next_modifier_" .. category
-			local padding = i > 1 and "  " or ""
-			local localized = managers.localization:to_upper_text(text_id, {
-				next = next_level - managers.crime_spree:server_spree_level()
-			})
-			upcoming_modifiers_text = upcoming_modifiers_text .. padding .. localized
-		end
-	end
-	
-	local desc_text = self._scroll_panel:text({
-		name = "description_text",
-		wrap = true,
-		word_wrap = true,
-		text = upcoming_modifiers_text,
-		font_size = tweak_data.menu.pd2_small_font_size,
-		font = tweak_data.menu.pd2_small_font,
-		color = tweak_data.screen_colors.text
-	})
-
-	if cs_modifiers_tab then
-		local text = ""
-
-		for i, text_id in ipairs(cs_modifiers_tab) do
-			text = text .. managers.localization:text(text_id) .. "\n"
-		end
-
-		desc_text:set_text(text)
-	end
-
-	self:_chk_add_scrolling()
-
-	if managers.skirmish:is_weekly_skirmish() then
-		managers.network:add_event_listener({}, "on_set_dropin", function ()
-			self:add_description_text("\n##" .. managers.localization:text("menu_weekly_skirmish_dropin_warning") .. "##")
-		end)
-	end
-end
-
-function CrimeSpreeModifierItem:reduce_to_small_font(iteration)
-	CrimeSpreeModifierItem.super.reduce_to_small_font(self, iteration)
-
-	if not alive(self._scroll_panel) then
-		return
-	end
-
-	local desc_text = self._scroll_panel:child("description_text")
-	local title_text = self._panel:child("title_text")
-
-	self._scroll_panel:set_h(self._panel:h())
-	self._scroll_panel:set_y(title_text:bottom())
-	self._scroll_panel:grow(0, -self._scroll_panel:y())
-
-	local show_scroll_line_top = desc_text:top() < 0
-	local show_scroll_line_bottom = self._scroll_panel:h() < desc_text:bottom()
-
-	if self._scroll_box then
-		self._scroll_box:create_sides(self._scroll_panel, {
-			sides = {
-				0,
-				0,
-				show_scroll_line_top and 2 or 0,
-				show_scroll_line_bottom and 2 or 0
-			}
-		})
-	end
-end
-
-function CrimeSpreeModifierItem:_chk_add_scrolling()
-	local desc_text = self._scroll_panel:child("description_text")
-	local _, _, _, h = desc_text:text_rect()
-
-	desc_text:set_h(h)
-
-	if self._scroll_panel:h() < desc_text:h() and not self._scrolling then
-		self._scrolling = true
-		self._scroll_box = BoxGuiObject:new(self._scroll_panel, {
-			sides = {
-				0,
-				0,
-				0,
-				0
-			}
-		})
-		self._show_scroll_line_top = false
-		self._show_scroll_line_bottom = false
-		local show_scroll_line_top = desc_text:top() < 0
-		local show_scroll_line_bottom = self._scroll_panel:h() < desc_text:bottom()
-
-		if show_scroll_line_top ~= self._show_scroll_line_top or show_scroll_line_bottom ~= self._show_scroll_line_bottom then
-			self._scroll_box:create_sides(self._scroll_panel, {
-				sides = {
-					0,
-					0,
-					show_scroll_line_top and 2 or 0,
-					show_scroll_line_bottom and 2 or 0
-				}
-			})
-
-			self._show_scroll_line_top = show_scroll_line_top
-			self._show_scroll_line_bottom = show_scroll_line_bottom
-		end
-
-		if not managers.menu:is_pc_controller() then
-			local legends = {
-				"menu_legend_preview_move"
-			}
-			local t_text = ""
-
-			for i, string_id in ipairs(legends) do
-				local spacing = i > 1 and "  |  " or ""
-				t_text = t_text .. spacing .. utf8.to_upper(managers.localization:text(string_id, {
-					BTN_UPDATE = managers.localization:btn_macro("menu_update"),
-					BTN_BACK = managers.localization:btn_macro("back")
-				}))
-			end
-
-			local legend_text = self._panel:text({
-				halign = "right",
-				valign = "top",
-				font = tweak_data.menu.pd2_small_font,
-				font_size = tweak_data.menu.pd2_small_font_size,
-				text = t_text
-			})
-			local _, _, lw, lh = legend_text:text_rect()
-
-			legend_text:set_size(lw, lh)
-			legend_text:set_righttop(self._panel:w() - 5, 5)
-		end
-	elseif self._scrolling then
-		-- Nothing
-	end
-end
-
-function CrimeSpreeModifierItem:on_whisper_mode_changed()
-	local briefing_id = managers.job:current_briefing_id()
-
-	if briefing_id then
-		local desc_string = managers.localization:text(briefing_id)
-		local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id()) and managers.groupai and managers.groupai:state():whisper_mode()
-
-		if is_level_ghostable then
-			if managers.job:is_level_ghostable_required(managers.job:current_level_id()) then
-				desc_string = desc_string .. "\n\n" .. managers.localization:text("menu_ghostable_stage_required")
-			else
-				desc_string = desc_string .. "\n\n" .. managers.localization:text("menu_ghostable_stage")
-			end
-		end
-
-		if managers.skirmish:is_weekly_skirmish() and not Global.statistics_manager.playing_from_start then
-			desc_string = desc_string .. "\n\n##" .. managers.localization:text("menu_weekly_skirmish_dropin_warning") .. "##"
-		end
-
-		self:set_description_text(desc_string)
-	end
-end
-
-function CrimeSpreeModifierItem:set_title_text(text)
-	self._panel:child("title_text"):set_text(text)
-end
-
-function CrimeSpreeModifierItem:add_description_text(text)
-	self:set_description_text(self._scroll_panel:child("description_text"):text() .. "\n" .. text)
-end
-
-function CrimeSpreeModifierItem:set_description_text(text)
-	local desc_text = self._scroll_panel:child("description_text")
-
-	desc_text:set_text(text)
-	managers.menu_component:make_color_text(desc_text, tweak_data.screen_colors.important_1)
-	self:_chk_add_scrolling()
-end
-
-function CrimeSpreeModifierItem:move_up()
-	if not managers.job:has_active_job() or not self._scrolling then
-		return
-	end
-
-	local desc_text = self._scroll_panel:child("description_text")
-
-	if desc_text:top() < 0 then
-		self._scroll_speed = 2
-	end
-end
-
-function CrimeSpreeModifierItem:move_down()
-	if not managers.job:has_active_job() or not self._scrolling then
-		return
-	end
-
-	local desc_text = self._scroll_panel:child("description_text")
-
-	if self._scroll_panel:h() < desc_text:bottom() then
-		self._scroll_speed = -2
-	end
-end
-
-function CrimeSpreeModifierItem:update(t, dt)
-	if not managers.job:has_active_job() or not self._scrolling then
-		return
-	end
-
-	local desc_text = self._scroll_panel:child("description_text")
-
-	if self._scroll_panel:h() < desc_text:h() and self._scroll_speed then
-		self._scroll_speed = math.step(self._scroll_speed, 0, dt * 4)
-
-		desc_text:move(0, math.clamp(self._scroll_speed, -1, 1) * 100 * dt)
-
-		if desc_text:top() > 0 then
-			desc_text:set_top(0)
-
-			self._scroll_speed = nil
-		elseif desc_text:bottom() < self._scroll_panel:h() then
-			desc_text:set_bottom(self._scroll_panel:h())
-
-			self._scroll_speed = nil
-		end
-
-		if self._scroll_speed == 0 then
-			self._scroll_speed = nil
-		end
-
-		local show_scroll_line_top = desc_text:top() < 0
-		local show_scroll_line_bottom = self._scroll_panel:h() < desc_text:bottom()
-
-		if show_scroll_line_top ~= self._show_scroll_line_top or show_scroll_line_bottom ~= self._show_scroll_line_bottom then
-			self._scroll_box:create_sides(self._scroll_panel, {
-				sides = {
-					0,
-					0,
-					show_scroll_line_top and 2 or 0,
-					show_scroll_line_bottom and 2 or 0
-				}
-			})
-
-			self._show_scroll_line_top = show_scroll_line_top
-			self._show_scroll_line_bottom = show_scroll_line_bottom
-		end
-	end
-end
-
-function CrimeSpreeModifierItem:select(no_sound)
-	CrimeSpreeModifierItem.super.select(self, no_sound)
-end
-
-function CrimeSpreeModifierItem:deselect()
-	CrimeSpreeModifierItem.super.deselect(self)
-end
-
-function CrimeSpreeModifierItem:mouse_moved(x, y)
-	return CrimeSpreeModifierItem.super.mouse_moved(self, x, y)
-end
-
-function CrimeSpreeModifierItem:mouse_pressed(button, x, y)
-	local inside = CrimeSpreeModifierItem.super.mouse_pressed(self, button, x, y)
-
-	if inside == false then
-		return false
-	end
-
-	return inside
 end
 
 function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
@@ -2020,11 +1647,9 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._description_item = DescriptionItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_description")), index, self._node:parameters().menu_component_data.saved_descriptions)
 	table.insert(self._items, self._description_item)
 	index = index + 1
-	if not managers.skirmish:is_skirmish() then
-		self._assets_item = AssetsItem:new(self._panel, managers.preplanning:has_current_level_preplanning() and managers.localization:to_upper_text("menu_preplanning") or utf8.to_upper(managers.localization:text("menu_assets")), index, {}, nil, asset_data)
-		table.insert(self._items, self._assets_item)
-		index = index + 1
-	end
+	self._assets_item = AssetsItem:new(self._panel, managers.preplanning:has_current_level_preplanning() and managers.localization:to_upper_text("menu_preplanning") or utf8.to_upper(managers.localization:text("menu_assets")), index, {}, nil, asset_data)
+	table.insert(self._items, self._assets_item)
+	index = index + 1
 	if managers.crime_spree:is_active() then
 		local gage_assets_data = {}
 		self._gage_assets_item = GageAssetsItem:new(self._panel, managers.localization:to_upper_text("menu_cs_gage_assets"), index)
@@ -2044,20 +1669,8 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		table.insert(self._items, self._mutators_item)
 		index = index + 1
 	end
-	if managers.crime_spree and managers.crime_spree:is_active() then
-		self._cs_modifer_item = CrimeSpreeModifierItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_cs_modifiers")), index, self._node:parameters().menu_component_data.cs_modifiers_tab)
-		table.insert(self._items, self._cs_modifer_item)
-		index = index + 1
-	end
-	local music_type = tweak_data.levels:get_music_style(Global.level_data.level_id)
-
-	if music_type == "heist" then
+	if tweak_data.levels[Global.level_data.level_id].music ~= "no_music" then
 		self._jukebox_item = JukeboxItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_jukebox")), index)
-		table.insert(self._items, self._jukebox_item)
-		index = index + 1
-	elseif music_type == "ghost" then
-		self._jukebox_item = JukeboxGhostItem:new(self._panel, utf8.to_upper(managers.localization:text("menu_jukebox")), index)
-
 		table.insert(self._items, self._jukebox_item)
 		index = index + 1
 	end
@@ -2085,6 +1698,16 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self:chk_reduce_to_small_font()
 	self._selected_item = 0
 	self:set_tab(self._node:parameters().menu_component_data.selected_tab, true)
+	local box_panel = self._panel:panel()
+	box_panel:set_shape(self._items[self._selected_item]:panel():shape())
+	BoxGuiObject:new(box_panel, {
+		sides = {
+			0,
+			0,
+			0,
+			0
+		}
+	})
 	if managers.assets:is_all_textures_loaded() or #managers.assets:get_all_asset_ids(true) == 0 then
 		self:create_asset_tab()
 	end
@@ -2113,7 +1736,12 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	local mutators_active = managers.mutators:are_mutators_enabled() and managers.mutators:allow_mutators_in_level(managers.job:current_level_id())
 	self._lobby_mutators_text:set_visible(mutators_active)
 	self._lobby_code_text = LobbyCodeMenuComponent:new(self._safe_workspace, self._full_workspace)
+
 	self._lobby_code_text:panel():set_layer(2)
+
+	if managers.crime_spree:is_active() then
+		self._lobby_code_text:panel():set_position(600, self._lobby_code_text:panel():y())
+	end
 	local local_peer = managers.network:session():local_peer()
 	for peer_id, peer in pairs(managers.network:session():peers()) do
 		if peer ~= local_peer then
@@ -2164,13 +1792,6 @@ function MissionBriefingGui:mouse_moved(x, y)
 	end
 	if managers.hud._hud_mission_briefing and managers.hud._hud_mission_briefing._backdrop then
 		managers.hud._hud_mission_briefing._backdrop:mouse_moved(x, y)
-	end
-	if self._lobby_code_text then
-		local success, mouse_state = self._lobby_code_text:mouse_moved(x, y)
-
-		if success then
-			return success, mouse_state
-		end
 	end
 	local u, p = self._multi_profile_item:mouse_moved(x, y)
 	return u or false, p or "arrow"

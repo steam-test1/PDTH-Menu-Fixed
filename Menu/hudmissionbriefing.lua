@@ -43,35 +43,22 @@ function HUDMissionBriefing:init(hud, workspace)
 	})
 	local server_peer = Network:is_server() and managers.network:session():local_peer() or managers.network:session():server_peer()
 	local is_multiplayer = not Global.game_settings.single_player
-	local load_level_data
-	-- if Global.load_level then
-		-- load_level_data = {
-		-- 	level_data = Global.level_data,
-		-- 	level_tweak_data = tweak_data.levels[Global.level_data.level_id] or {}
-		-- }
-		-- load_level_data.level_tweak_data.name = load_level_data.level_tweak_data.name_id and managers.localization:text(load_level_data.level_tweak_data.name_id)
-		-- load_level_data.gui_tweak_data = tweak_data.load_level
-		-- local load_data = load_level_data.level_tweak_data.load_data
-		local job_data = managers.job:current_job_data() or {}
-		local level_data = tweak_data.levels[Global.game_settings.level_id]
-		local bg_texture = level_data.load_screen or job_data.load_screen or "guis/textures/loading/loading_bg" 
-		-- local level_data = tweak_data.levels[Global.game_settings.level_id]
-		-- local level_rect = "level_image_".. string.gsub(Global.game_settings.level_id, "_day", ""):gsub("_night",""):gsub("_skip2",""):gsub("_skip1",""):gsub("_prof","")
-		self._level_image = self._background_layer_three:bitmap({
-			texture = bg_texture,
-			-- texture_rect = PDTH_Menu[level_rect],
-			visible = true,
-			layer = 0,	
-			w = self._info_bg_rect:w() - 16,
-			h = 270
-		})
-		-- log("[PDTH Menu] Current level ID: " .. tostring(level_rect) .. " = " .. tostring(PDTH_Menu[level_rect]))
-		-- for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
-		-- 	if not PDTH_Menu["level_image_"..string.gsub(job_id, "_day", ""):gsub("_night",""):gsub("_skip2",""):gsub("_skip1",""):gsub("_prof","")] then
-		-- 		log(job_id .. " is missing...")
-		-- 	end
-		-- end
-	-- end
+	local level_data = tweak_data.levels[Global.game_settings.level_id]
+	local level_rect = "level_image_".. string.gsub(Global.game_settings.level_id, "_day", ""):gsub("_night",""):gsub("_skip2",""):gsub("_skip1",""):gsub("_prof","")
+	self._level_image = self._background_layer_three:bitmap({
+		texture = "guis/textures/wwise_df",
+		texture_rect = PDTH_Menu[level_rect],
+		visible = PDTH_Menu[level_rect] ~= nil,
+		layer = 0,	
+		w = self._info_bg_rect:w() - 16,
+		h = 270
+	})
+	log("[PDTH Menu] Current level ID: " .. tostring(level_rect) .. " = " .. tostring(PDTH_Menu[level_rect]))
+	for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
+		if not PDTH_Menu["level_image_"..string.gsub(job_id, "_day", ""):gsub("_night",""):gsub("_skip2",""):gsub("_skip1",""):gsub("_prof","")] then
+			log(job_id .. " is missing...")
+		end
+	end
 	self._upper_frame_gradient = self._background_layer_three:rect({
 		x = 0,
 		y = 0,
@@ -93,7 +80,7 @@ function HUDMissionBriefing:init(hud, workspace)
 		w = 256,
 		h = 56
 	})	
-	local level_data = tweak_data.levels[Global.game_settings.level_id]
+
 	self._upper_frame_gradient:set_top(self._background_layer_three:top())
 	self._lower_frame_gradient:set_bottom(self._background_layer_three:bottom())
 	self._pd2_logo:set_bottom(75)
@@ -159,15 +146,9 @@ function HUDMissionBriefing:init(hud, workspace)
 		h = content_font_size,
 		layer = 1
 	})
-	local mission = managers.crime_spree:get_mission()
-	local cs_level = managers.crime_spree:spree_level()
-	local lvl_name = utf8.to_upper("" .. managers.localization:text(level_data.name_id))
-	if managers.crime_spree:is_active() then
-		lvl_name = utf8.to_upper("" .. managers.localization:text(level_data.name_id)) .. " + " .. mission.add
-	end
 	self._level_text = self._gui_info_panel:text({
 		name = "level_text",
-		text = lvl_name,
+		text = string.upper("" .. managers.localization:text(level_data.name_id)),
 		color = PDTHMenu_color_marker,
 		font = PDTHMenu_font,
 		font_size = tweak_data.menu.small_font_size,
@@ -177,15 +158,9 @@ function HUDMissionBriefing:init(hud, workspace)
 		h = content_font_size,
 		layer = 1
 	})
-	local diff_title = string.upper(managers.localization:text("menu_lobby_difficulty_title"))
-	if managers.crime_spree:is_active() then
-		diff_title = string.upper(managers.localization:text("steam_rp_current_spree", {
-			level = ": "
-		}))
-	end
 	self._difficulty_title = self._gui_info_panel:text({
 		name = "difficulty_title",
-		text = diff_title,
+		text = string.upper(managers.localization:text("menu_lobby_difficulty_title")),
 		font = PDTHMenu_font,
 		font_size = tweak_data.menu.small_font_size,
 		align = "left",
@@ -194,23 +169,15 @@ function HUDMissionBriefing:init(hud, workspace)
 		h = content_font_size,
 		layer = 1
 	})
-	local difficulty = Global.game_settings.difficulty
-	if Global.game_settings.difficulty == "overkill" then
-		difficulty = "very_hard"
-	elseif Global.game_settings.difficulty == "overkill_145" then
+	difficulty = Global.game_settings.difficulty
+	if Global.game_settings.difficulty == "overkill_145" then
 		difficulty = "overkill"
 	elseif Global.game_settings.difficulty == "overkill_290" then
 		difficulty = "apocalypse"
 	end
-	local diff_text = string.upper(managers.localization:text("menu_difficulty_" .. difficulty))
-	if managers.crime_spree:is_active() then
-		diff_text = string.upper(managers.localization:text("clean_cs_level", {
-			level = cs_level
-		}))
-	end
 	self._difficulty_text = self._gui_info_panel:text({
 		name = "difficulty_text",
-		text = diff_text,
+		text = string.upper(managers.localization:text("menu_difficulty_" .. difficulty)),
 		color = PDTHMenu_color_marker,
 		font = PDTHMenu_font,
 		font_size = tweak_data.menu.small_font_size,
@@ -219,11 +186,7 @@ function HUDMissionBriefing:init(hud, workspace)
 		w = 256,
 		h = content_font_size,
 		layer = 1
-	})
-	if managers.skirmish:is_skirmish() then
-		self._difficulty_title:set_visible(false)
-		self._difficulty_text:set_visible(false)
-	end
+	})	
 	self._day_title = self._gui_info_panel:text({
 		name = "day_title",
 		text = string.upper(managers.localization:text("menu_day_short", {day = ""}))..":",
@@ -233,8 +196,7 @@ function HUDMissionBriefing:init(hud, workspace)
 		vertical = "center",
 		w = 256,
 		h = content_font_size,
-		layer = 1,
-		visible = false
+		layer = 1
 	})	
 	self._day_text = self._gui_info_panel:text({
 		name = "day_text",
@@ -246,18 +208,8 @@ function HUDMissionBriefing:init(hud, workspace)
 		vertical = "center",
 		w = 256,
 		h = content_font_size,
-		layer = 1,
-		visible = false
+		layer = 1
 	})
-	
-	self._current_stage_data = managers.job:current_stage_data()
-	self._current_job_chain = managers.job:current_job_chain_data()
-	
-	if #self._current_job_chain > 1 then
-		self._day_title:set_visible(true)
-		self._day_text:set_visible(true)
-	end
-
 	local offset = 22 
 	local x, y, w, h = self._server_title:text_rect()
 	self._server_title:set_x(10)
@@ -279,24 +231,19 @@ function HUDMissionBriefing:init(hud, workspace)
 	self._level_title:set_w(w)
 	self._level_text:set_lefttop(self._level_title:righttop())
 	self._level_text:set_w(self._gui_info_panel:w())
-	
-	if not managers.skirmish:is_skirmish() then
-		local x, y, w, h = self._difficulty_title:text_rect()
-		self._difficulty_title:set_x(10)
-		self._difficulty_title:set_y(10 + offset * (is_multiplayer and 3 or 1))
-		self._difficulty_title:set_w(w)
-		self._difficulty_text:set_lefttop(self._difficulty_title:righttop())
-		self._difficulty_text:set_w(self._gui_info_panel:w())	
-	end
+	local x, y, w, h = self._difficulty_title:text_rect()
+	self._difficulty_title:set_x(10)
+	self._difficulty_title:set_y(10 + offset * (is_multiplayer and 3 or 1))
+	self._difficulty_title:set_w(w)
+	self._difficulty_text:set_lefttop(self._difficulty_title:righttop())
+	self._difficulty_text:set_w(self._gui_info_panel:w())	
 
-	if #self._current_job_chain > 1 then
-		local x, y, w, h = self._day_title:text_rect()
-		self._day_title:set_x(10)
-		self._day_title:set_y(10 + offset * (is_multiplayer and 4 or 2))
-		self._day_title:set_w(w)
-		self._day_text:set_lefttop(self._day_title:righttop())
-		self._day_text:set_w(self._gui_info_panel:w())
-	end
+	local x, y, w, h = self._day_title:text_rect()
+	self._day_title:set_x(10)
+	self._day_title:set_y(10 + offset * (is_multiplayer and 4 or 2))
+	self._day_title:set_w(w)
+	self._day_text:set_lefttop(self._day_title:righttop())
+	self._day_text:set_w(self._gui_info_panel:w())
 
 	self._ready_slot_panel:set_bottom(self._foreground_layer_one:h())
 	self._ready_slot_panel:set_left(self._foreground_layer_one:left() - 15 )	
@@ -341,7 +288,7 @@ function HUDMissionBriefing:init(hud, workspace)
 			w = 40,
 			h = 40,
 			x = 8,
-		    texture = "PDTHMenu/trial_bridge",
+		    texture = "guis/textures/trial_bridge",
 		    texture_rect = PDTH_Menu.lobby_icon_unknown
 		})
 		mugshot:set_bottom(bg_rect:bottom())
@@ -483,7 +430,9 @@ function HUDMissionBriefing:init(hud, workspace)
 	end
 	self._current_contact_data = managers.job:current_contact_data()
 	self._current_level_data = managers.job:current_level_data()
+	self._current_stage_data = managers.job:current_stage_data()
 	self._current_job_data = managers.job:current_job_data()
+	self._current_job_chain = managers.job:current_job_chain_data()
 	self._job_class = self._current_job_data and self._current_job_data.jc or 0
 	local contact_gui = self._background_layer_two:gui(self._current_contact_data.assets_gui, {})
 	local contact_pattern = contact_gui:has_script() and contact_gui:script().pattern
@@ -684,6 +633,9 @@ function HUDMissionBriefing:init(hud, workspace)
 		self._paygrade_panel:move(0, -pg_text:h())
 	end
 	self._background_layer_two:clear()
+end
+function HUDMissionBriefing:update_difficulty(difficulty)
+	self._difficulty_text:set_text(string.upper(managers.localization:text("menu_difficulty_" .. difficulty)))
 end
 function HUDMissionBriefing:_apply_ghost_color(ghost, i, is_unknown)
 	local accumulated_ghost_bonus = managers.job:get_accumulated_ghost_bonus()

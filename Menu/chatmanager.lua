@@ -3,6 +3,7 @@ ChatManager.GAME = 1
 ChatManager.CREW = 2
 ChatManager.GLOBAL = 3
 
+ChatGui = ChatGui or class(ChatBase)
 ChatGui.line_height = 22
 function ChatGui:init(ws)
 	self._ws = ws
@@ -10,7 +11,7 @@ function ChatGui:init(ws)
 	self:set_channel_id(ChatManager.GAME)
 	self._panel_width = self._hud_panel:w() * 0.5
 	self._output_width = self._panel_width - 15
-	self._panel_height = 510
+	self._panel_height = 500
 	self._max_lines = 5
 	self._lines = {}
 	self._esc_callback = callback(self, self, "esc_key_callback")
@@ -684,6 +685,12 @@ function ChatGui:enter_loose_focus_delay_end()
 	self._enter_loose_focus_delay = nil
 	self._enter_loose_focus_delay_end = nil
 end
+function ChatGui:special_btn_pressed(button)
+	if MenuCallbackHandler:is_win32() and button == Idstring("toggle_chat") and not self._focus and self._is_crimenet_chat then
+		self:toggle_crimenet_chat()
+		return true
+	end
+end
 function ChatGui:mouse_moved(x, y)
 	if not self._enabled then
 		return false, false
@@ -710,24 +717,15 @@ function ChatGui:mouse_moved(x, y)
 		return false, false
 	end
 	local inside = self._input_panel:inside(x, y)
-	local my_input_focus = self:input_focus()
-	local ui_input_focus = managers.menu_component:input_focus()
-	local can_focus = my_input_focus == true or ui_input_focus ~= true
-
-	if can_focus then
-		self._input_panel:child("focus_indicator"):set_visible(inside or self._focus)
-		self._panel:child("chat_line"):set_color((inside or self._focus) and tweak_data.hud.prime_color or Color.white)
-		if self._panel:child("scroll_bar"):visible() and self._panel:child("scroll_bar"):inside(x, y) then
-			return true, "hand"
-		elseif self._panel:child("scroll_down_indicator_arrow"):visible() and self._panel:child("scroll_down_indicator_arrow"):inside(x, y) or self._panel:child("scroll_up_indicator_arrow"):visible() and self._panel:child("scroll_up_indicator_arrow"):inside(x, y) then
-			return true, "link"
-		end
+	self._panel:child("chat_line"):set_color((inside or self._focus) and tweak_data.hud.prime_color or Color.white)
+	if self._panel:child("scroll_bar"):visible() and self._panel:child("scroll_bar"):inside(x, y) then
+		return true, "hand"
+	elseif self._panel:child("scroll_down_indicator_arrow"):visible() and self._panel:child("scroll_down_indicator_arrow"):inside(x, y) or self._panel:child("scroll_up_indicator_arrow"):visible() and self._panel:child("scroll_up_indicator_arrow"):inside(x, y) then
+		return true, "link"
 	end
-
 	if self._focus then
 		inside = not inside
 	end
-
 	return inside or self._focus, inside and "link" or "arrow"
 end
 function ChatGui:moved_scroll_bar(x, y)
@@ -764,6 +762,51 @@ function ChatGui:mouse_released(o, button, x, y)
 		return
 	end
 	self:release_scroll_bar()
+end
+function ChatGui:mouse_pressed(button, x, y)
+	if not self._enabled then
+		return
+	end
+	local chat_button_panel = self._hud_panel:child("chat_button_panel")
+	if button == Idstring("0") and chat_button_panel and chat_button_panel:visible() then
+		local chat_button = chat_button_panel:child("chat_button")
+		if chat_button:inside(x, y) then
+			self:toggle_crimenet_chat()
+			return true
+		end
+	end
+	if self._is_crimenet_chat and not self._crimenet_chat_state then
+		return false, false
+	end
+	local inside = self._input_panel:inside(x, y)
+	if inside then
+		self:_on_focus()
+		return true
+	end
+	if self._panel:child("output_panel"):inside(x, y) then
+		if button == Idstring("mouse wheel down") then
+			if self:mouse_wheel_down(x, y) then
+				self:set_scroll_indicators()
+				self:_on_focus()
+				return true
+			end
+		elseif button == Idstring("mouse wheel up") then
+			if self:mouse_wheel_up(x, y) then
+				self:set_scroll_indicators()
+				self:_on_focus()
+				return true
+			end
+		elseif button == Idstring("0") and self:check_grab_scroll_panel(x, y) then
+			self:set_scroll_indicators()
+			self:_on_focus()
+			return true
+		end
+	elseif button == Idstring("0") and self:check_grab_scroll_bar(x, y) then
+		self:set_scroll_indicators()
+		self:_on_focus()
+		return true
+	end
+	return self:_loose_focus()
 end
 function ChatGui:check_grab_scroll_panel(x, y)
 	return false
@@ -975,10 +1018,111 @@ function ChatGui:enter_text(o, s)
 	end
 	self:update_caret()
 end
+function ChatGui:update_key_down(o, k)
+	wait(0.6)
+	local text = self._input_panel:child("input_text")
+	while self._key_pressed == k do
+		local s, e = text:selection()
+		local n = utf8.len(text:text())
+		local d = math.abs(e - s)
+		if self._key_pressed == Idstring("backspace") then
+			if s == e and s > 0 then
+				text:set_selection(s - 1, e)
+			end
+			text:replace_text("")
+			if not (utf8.len(text:text()) < 1) or type(self._esc_callback) ~= "number" then
+			end
+		elseif self._key_pressed == Idstring("delete") then
+			if s == e and s < n then
+				text:set_selection(s, e + 1)
+			end
+			text:replace_text("")
+			if not (utf8.len(text:text()) < 1) or type(self._esc_callback) ~= "number" then
+			end
+		elseif self._key_pressed == Idstring("left") then
+			if s < e then
+				text:set_selection(s, s)
+			elseif s > 0 then
+				text:set_selection(s - 1, s - 1)
+			end
+		elseif self._key_pressed == Idstring("right") then
+			if s < e then
+				text:set_selection(e, e)
+			elseif s < n then
+				text:set_selection(s + 1, s + 1)
+			end
+		else
+			self._key_pressed = false
+		end
+		self:update_caret()
+		wait(0.03)
+	end
+end
 function ChatGui:key_release(o, k)
 	if self._key_pressed == k then
 		self._key_pressed = false
 	end
+end
+function ChatGui:key_press(o, k)
+	if self._skip_first then
+		if k == Idstring("enter") then
+			self._skip_first = false
+		end
+		return
+	end
+	if not self._enter_text_set then
+		self._input_panel:enter_text(callback(self, self, "enter_text"))
+		self._enter_text_set = true
+	end
+	local text = self._input_panel:child("input_text")
+	local s, e = text:selection()
+	local n = utf8.len(text:text())
+	local d = math.abs(e - s)
+	self._key_pressed = k
+	text:stop()
+	text:animate(callback(self, self, "update_key_down"), k)
+	if k == Idstring("backspace") then
+		if s == e and s > 0 then
+			text:set_selection(s - 1, e)
+		end
+		text:replace_text("")
+		if not (utf8.len(text:text()) < 1) or type(self._esc_callback) ~= "number" then
+		end
+	elseif k == Idstring("delete") then
+		if s == e and s < n then
+			text:set_selection(s, e + 1)
+		end
+		text:replace_text("")
+		if not (utf8.len(text:text()) < 1) or type(self._esc_callback) ~= "number" then
+		end
+	elseif k == Idstring("left") then
+		if s < e then
+			text:set_selection(s, s)
+		elseif s > 0 then
+			text:set_selection(s - 1, s - 1)
+		end
+	elseif k == Idstring("right") then
+		if s < e then
+			text:set_selection(e, e)
+		elseif s < n then
+			text:set_selection(s + 1, s + 1)
+		end
+	elseif self._key_pressed == Idstring("end") then
+		text:set_selection(n, n)
+	elseif self._key_pressed == Idstring("home") then
+		text:set_selection(0, 0)
+	elseif k == Idstring("enter") then
+		if type(self._enter_callback) ~= "number" then
+			self._enter_callback()
+		end
+	elseif k == Idstring("esc") and type(self._esc_callback) ~= "number" then
+		text:set_text("")
+		text:set_selection(0, 0)
+		self._esc_callback()
+	end
+	self:update_caret()
+end
+function ChatGui:send_message(name, message)
 end
 function ChatGui:receive_message(name, message, color, icon)
 	if not alive(self._panel) or not managers.network:session() then

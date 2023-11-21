@@ -6,16 +6,15 @@ local make_fine_text = function(text)
 	return x, y, w, h
 end
 function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
-	local num_unlocks = math.clamp(params.unlocks, HUDPackageUnlockedItem.MIN_DISPLAYED, HUDPackageUnlockedItem.MAX_DISPLAYED)
 	self._panel = panel:panel({
 		w = panel:w() - 20,
-		h = panel:h() * 1 / num_unlocks - 15 - 10,
+		h = panel:h() * 0.5,
 		x = -80,
 		y = 200,
 		alpha = 0
 	})
 	self._panel:move(0, self._panel:h() * (row - 1))
-	if HUDPackageUnlockedItem.MAX_DISPLAYED < row then
+ 	if row > 2 then
 		self._panel:hide()
 	end
 	local announcement = params.announcement
@@ -23,48 +22,22 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 	local ghost_bonus = params.ghost_bonus
 	local gage_assignment = params.gage_assignment
 	local challenge_completed = params.challenge_completed
-	local tango_mission_completed = params.tango_mission
 	local bitmap_texture = "guis/textures/pd2/endscreen/test_icon_package"
 	local text_string = ""
 	local blend_mode = "normal"
 	local post_event = "stinger_new_weapon"
 	local wait_time = 0.35
-
 	if announcement then
 		bitmap_texture = "guis/textures/pd2/endscreen/announcement"
 		text_string = managers.localization:to_upper_text("menu_es_announcement") .. "\n" .. managers.localization:to_upper_text(announcement)
-		blend_mode = "add"
-	elseif params.skirmish_wave then
-		bitmap_texture = "guis/dlcs/skm/textures/pd2/endscreen/announcement_skm"
-		local text_id = nil
-
-		if params.success then
-			if params.skirmish_wave == select(2, managers.skirmish:wave_range()) then
-				text_id = "menu_skirmish_success_all_end_screen"
-			else
-				text_id = "menu_skirmish_success_end_screen"
-			end
-		else
-			text_id = "menu_skirmish_fail_end_screen"
-		end
-
-		text_string = managers.localization:to_upper_text(text_id, {
-			wave = params.skirmish_wave
-		})
-
-		if managers.skirmish:is_weekly_skirmish() and #managers.skirmish:unclaimed_rewards() > 0 then
-			text_string = text_string .. " " .. managers.localization:to_upper_text("menu_skirmish_weekly_reward_end_screen")
-		end
+		blend_mode = "normal"
 	elseif upgrade then
 		local upgrade_def = tweak_data.upgrades.definitions[upgrade]
-
 		if upgrade_def then
 			local category = Idstring(upgrade_def.category)
-
 			if category == Idstring("weapon") then
-				local weapon_id = upgrade_def.weapon_id
 				local weapon_name = managers.weapon_factory:get_weapon_name_by_factory_id(upgrade_def.factory_id)
-				local weapon_class = managers.localization:text("menu_" .. tweak_data.weapon[upgrade_def.weapon_id].categories[1])
+				local weapon_class = managers.localization:text("menu_" .. tweak_data.weapon[upgrade_def.weapon_id].category)
 				local weapon_category = managers.localization:text("bm_menu_" .. (tweak_data.weapon[upgrade_def.weapon_id].use_data.selection_index == 2 and "primaries" or "secondaries"))
 				bitmap_texture = managers.blackmarket:get_weapon_icon_path(weapon_id, nil)
 				text_string = managers.localization:text("menu_es_package_weapon", {
@@ -76,36 +49,20 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 			elseif category == Idstring("armor") then
 				local guis_catalog = "guis/"
 				local bundle_folder = tweak_data.blackmarket.armors[upgrade_def.armor_id] and tweak_data.blackmarket.armors[upgrade_def.armor_id].texture_bundle_folder
-
 				if bundle_folder then
 					guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
 				end
-
 				bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/armors/" .. upgrade_def.armor_id
 				text_string = managers.localization:text("menu_es_package_armor", {
 					armor = managers.localization:to_upper_text(upgrade_def.name_id)
-				})
-			elseif category == Idstring("grenade") then
-				local guis_catalog = "guis/"
-				local bundle_folder = tweak_data.blackmarket.projectiles[upgrade] and tweak_data.blackmarket.projectiles[upgrade].texture_bundle_folder
-
-				if bundle_folder then
-					guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-				end
-
-				bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/grenades/" .. upgrade
-				text_string = managers.localization:text("menu_es_package_projectile", {
-					projectile = managers.localization:to_upper_text(tweak_data.blackmarket.projectiles[upgrade].name_id)
 				})
 			elseif category == Idstring("melee_weapon") then
 				local bm_tweak_data = tweak_data.blackmarket.melee_weapons[upgrade]
 				local guis_catalog = "guis/"
 				local bundle_folder = bm_tweak_data and bm_tweak_data.texture_bundle_folder
-
 				if bundle_folder then
 					guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
 				end
-
 				bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/melee_weapons/" .. upgrade
 				text_string = managers.localization:text("menu_es_package_melee_weapon", {
 					melee_weapon = bm_tweak_data and managers.localization:to_upper_text(bm_tweak_data.name_id)
@@ -115,14 +72,12 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 				text_string = managers.localization:to_upper_text("menu_es_rep_upgrade", {
 					point = upgrade_def.value or 2
 				})
-				blend_mode = "add"
-
+				blend_mode = "normal"
 				hud_stage_end_screen:give_skill_points(upgrade_def.value or 2)
 			elseif DB:has(Idstring("texture"), "guis/textures/pd2/endscreen/" .. upgrade_def.category) then
 				bitmap_texture = "guis/textures/pd2/endscreen/" .. upgrade_def.category
 			else
 				bitmap_texture = "guis/textures/pd2/endscreen/what_is_this"
-
 				Application:error("[HUDPackageUnlockedItem] Unknown category detected!", upgrade_def.category, category)
 			end
 		end
@@ -130,33 +85,25 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 		local on_last_stage = managers.job:on_last_stage()
 		bitmap_texture = "guis/textures/pd2/endscreen/stealth_bonus"
 		local string_id = on_last_stage and "menu_es_ghost_bonus_job" or "menu_es_ghost_bonus_day"
-		text_string = managers.localization:to_upper_text(string_id, {
-			bonus = ghost_bonus
-		})
-		blend_mode = "add"
+		text_string = managers.localization:to_upper_text(string_id, {bonus = ghost_bonus})
+		blend_mode = "normal"
 	elseif gage_assignment then
 		local completed, progressed = managers.gage_assignment:get_latest_data()
 		bitmap_texture = "guis/dlcs/gage_pack_jobs/textures/pd2/endscreen/gage_assignment"
-		blend_mode = "add"
+		blend_mode = "normal"
 		local string_id = ""
-
-		if table.size(completed) > 0 then
+		if 0 < table.size(completed) then
 			string_id = "menu_es_gage_assignment_package_complete"
 			post_event = "gage_package_win"
 			wait_time = 0.6
 		else
 			string_id = "menu_es_gage_assignment_package"
 		end
-
 		text_string = managers.localization:to_upper_text(string_id, {})
 	elseif challenge_completed then
 		bitmap_texture = "guis/textures/pd2/endscreen/announcement"
-		blend_mode = "add"
+		blend_mode = "normal"
 		text_string = managers.localization:to_upper_text("menu_es_challenge_completed", {})
-	elseif tango_mission_completed then
-		bitmap_texture = "guis/dlcs/tng/textures/pd2/blackmarket/icons/endscreen_icons/endscreen_gage_modpack"
-		blend_mode = "add"
-		text_string = managers.localization:to_upper_text("menu_es_tango_completed", {})
 	else
 		Application:debug("HUDPackageUnlockedItem: Something something unknown")
 	end
@@ -196,9 +143,7 @@ end
 function HUDStageEndScreen:init(hud, workspace)
 	self._backdrop = MenuBackdropGUI:new(workspace)
 	self._backdrop:create_black_borders()
-	if PDTH_Menu.options.enable_pdth_endscreen_texture then
-		self._backdrop:set_bg("PDTHMenu/seven_figures_logo")
-	end
+	self._backdrop:set_bg("guis/textures/seven_figures_logo")
 	self._hud = hud
 	self._workspace = workspace
 	self._singleplayer = Global.game_settings.single_player
@@ -296,61 +241,73 @@ function HUDStageEndScreen:init(hud, workspace)
 		font = title_font,
 		color = tweak_data.screen_colors.text
 	})
-
+	local bg_text = self._background_layer_full:text({
+		name = "stage_text",
+		text = self._stage_name,
+		h = bg_font_size,
+		align = "left",
+		vertical = "top",
+		font_size = bg_font_size,
+		font = bg_font,
+		color = tweak_data.screen_colors.button_stage_3,
+		alpha = 0.4
+	})
+	bg_text:set_world_center_y(self._foreground_layer_safe:child("stage_text"):world_center_y())
+	bg_text:set_world_x(self._foreground_layer_safe:child("stage_text"):world_x())
+	bg_text:move(-13, 9)
+	self._backdrop:animate_bg_text(bg_text)
 	self._coins_backpanel = self._background_layer_safe:panel({
 		name = "coins_backpanel",
-		y = 70,
 		w = self._background_layer_safe:w() / 2 - 10,
-		h = self._background_layer_safe:h() / 2
+		h = self._background_layer_safe:h() / 2,
+		y = 70
 	})
 	self._coins_forepanel = self._foreground_layer_safe:panel({
 		name = "coins_forepanel",
-		y = 70,
 		w = self._foreground_layer_safe:w() / 2 - 10,
-		h = self._foreground_layer_safe:h() / 2
+		h = self._foreground_layer_safe:h() / 2,
+		y = 70
 	})
 	local level_progress_text = self._coins_forepanel:text({
-		vertical = "top",
 		name = "coin_progress_text",
-		align = "left",
-		y = 10,
-		x = 10,
 		text = managers.localization:to_upper_text("menu_es_coins_progress"),
+		align = "left",
+		vertical = "top",
 		h = content_font_size + 2,
 		font_size = content_font_size,
 		font = content_font,
-		color = tweak_data.screen_colors.text
+		color = tweak_data.screen_colors.text,
+		x = 10,
+		y = 10
 	})
 	local _, _, lw, lh = level_progress_text:text_rect()
-
 	level_progress_text:set_size(lw, lh)
-
 	local coins_bg_circle = self._coins_backpanel:bitmap({
-		texture = "guis/textures/pd2/endscreen/exp_ring",
 		name = "bg_progress_circle",
-		alpha = 0.6,
-		blend_mode = "normal",
+		texture = "guis/textures/pd2/endscreen/exp_ring",
 		h = self._coins_backpanel:h() - content_font_size,
 		w = self._coins_backpanel:h() - content_font_size,
 		y = content_font_size,
-		color = Color.black
+		color = Color.black,
+		alpha = 0.6,
+		blend_mode = "normal"
 	})
 	self._coins_circle = self._coins_backpanel:bitmap({
-		texture = "guis/textures/pd2/endscreen/exp_ring",
 		name = "progress_circle",
-		blend_mode = "add",
-		render_template = "VertexColorTexturedRadial",
-		layer = 1,
+		texture = "guis/textures/pd2/endscreen/exp_ring",
 		h = self._coins_backpanel:h() - content_font_size,
 		w = self._coins_backpanel:h() - content_font_size,
 		y = content_font_size,
-		color = Color(0, 1, 1)
+		color = Color(0, 1, 1),
+		render_template = "VertexColorTexturedRadial",
+		blend_mode = "add",
+		layer = 1
 	})
 	self._coins_text = self._coins_forepanel:text({
 		name = "coins_text",
-		vertical = "center",
-		align = "center",
 		text = "",
+		align = "center",
+		vertical = "center",
 		font_size = bg_font_size,
 		font = bg_font,
 		h = self._coins_backpanel:h() - content_font_size,
@@ -366,11 +323,10 @@ function HUDStageEndScreen:init(hud, workspace)
 			1
 		}
 	})
-
 	self._lp_backpanel = self._background_layer_safe:panel({
 		name = "lp_backpanel",
-		w = self._background_layer_safe:w() / 3,
-		h = self._background_layer_safe:h() / 3,
+		w = self._background_layer_safe:w() / 2 - 10,
+		h = self._background_layer_safe:h() / 2,
 		y = 70
 	})
 	self._lp_forepanel = self._foreground_layer_safe:panel({
@@ -403,18 +359,6 @@ function HUDStageEndScreen:init(hud, workspace)
 		alpha = 0.6,
 		blend_mode = "normal"
 	})
-	self._prestige_lp_circle = self._lp_backpanel:bitmap({
-		texture = "guis/textures/pd2/exp_ring_purple",
-		name = "bg_infamy_progress_circle",
-		blend_mode = "add",
-		render_template = "VertexColorTexturedRadial",
-		layer = -1,
-		x = lp_bg_circle:x(),
-		y = lp_bg_circle:y(),
-		h = lp_bg_circle:h(),
-		w = lp_bg_circle:w(),
-		color = Color(0, 1, 1)
-	})
 	self._lp_circle = self._lp_backpanel:bitmap({
 		name = "progress_circle",
 		texture = "guis/textures/pd2/endscreen/exp_ring",
@@ -423,7 +367,7 @@ function HUDStageEndScreen:init(hud, workspace)
 		y = content_font_size,
 		color = Color(0, 1, 1),
 		render_template = "VertexColorTexturedRadial",
-		blend_mode = "normal",
+		blend_mode = "add",
 		layer = 1
 	})
 	self._lp_text = self._lp_forepanel:text({
@@ -431,7 +375,7 @@ function HUDStageEndScreen:init(hud, workspace)
 		text = "",
 		align = "center",
 		vertical = "center",
-		font_size = 48,
+		font_size = bg_font_size,
 		font = bg_font,
 		h = self._lp_backpanel:h() - content_font_size,
 		w = self._lp_backpanel:h() - content_font_size,
@@ -587,7 +531,6 @@ function HUDStageEndScreen:init(hud, workspace)
 	if squeeze_more_pixels then
 		lp_bg_circle:move(-20, 0)
 		self._lp_circle:move(-20, 0)
-		self._prestige_lp_circle:move(-20, 0)
 		self._lp_text:move(-20, 0)
 		self._lp_curr_xp:move(-30, 0)
 		self._lp_xp_gained:move(-30, 0)
@@ -597,17 +540,17 @@ function HUDStageEndScreen:init(hud, workspace)
 	end
 	self._box = BoxGuiObject:new(self._lp_backpanel, {
 		sides = {
-			0,
-			0,
-			0,
-			0
+			1,
+			1,
+			1,
+			1
 		}
 	})
 	WalletGuiObject.set_wallet(self._foreground_layer_safe)
 	self._package_forepanel = self._foreground_layer_safe:panel({
 		name = "package_forepanel",
 		w = self._foreground_layer_safe:w() / 2 - 10,
-		h = self._foreground_layer_safe:h() / 2,
+		h = self._foreground_layer_safe:h() / 2 - 70 - 10,
 		y = 70,
 		alpha = 1
 	})
@@ -618,17 +561,17 @@ function HUDStageEndScreen:init(hud, workspace)
 		font_size = content_font_size,
 		text = "",
 		x = 10,
-		y = 500
+		y = 10
 	})
 	local package_box_panel = self._foreground_layer_safe:panel()
 	package_box_panel:set_shape(self._package_forepanel:shape())
 	package_box_panel:set_layer(self._package_forepanel:layer())
 	self._package_box = BoxGuiObject:new(package_box_panel, {
 		sides = {
-			0,
-			0,
-			0,
-			0
+			1,
+			1,
+			1,
+			1
 		}
 	})
 	self._package_items = {}
@@ -644,27 +587,24 @@ function HUDStageEndScreen:init(hud, workspace)
 	end
 	local skip_panel = self._foreground_layer_safe:panel({
 		name = "skip_forepanel",
-		y = 70,
 		w = self._foreground_layer_safe:w() / 2 - 10,
-		h = self._foreground_layer_safe:h() / 2
+		h = self._foreground_layer_safe:h() / 2,
+		y = 70
 	})
 	local macros = {
 		BTN_SPEED = managers.localization:btn_macro("menu_challenge_claim", true)
 	}
-
 	if not managers.menu:is_pc_controller() then
 		macros.BTN_SPEED = managers.localization:get_default_macro("BTN_SWITCH_WEAPON")
 	end
-
 	self._skip_text = skip_panel:text({
 		name = "skip_text",
-		visible = false,
-		alpha = 0.5,
 		font = small_font,
 		font_size = small_font_size,
-		text = managers.localization:to_upper_text("menu_stageendscreen_speed_up", macros)
+		text = managers.localization:to_upper_text("menu_stageendscreen_speed_up", macros),
+		alpha = 0.5,
+		visible = false
 	})
-
 	make_fine_text(self._skip_text)
 	self._skip_text:set_right(skip_panel:w() - 10)
 	self._skip_text:set_bottom(skip_panel:h() - 10)
@@ -727,6 +667,6 @@ function HUDStageEndScreen:stage_spin_up(t, dt)
 	self:step_stage_up()
 end
 
-Hooks:PostHook(HUDStageEndScreen, "stage_money_counter_init", "hide_money_video", function(self)
+Hooks:PostHook(HUDStageEndScreen, "create_money_counter", "fuck_the_video", function(self)
 	self._background_layer_full:child("money_video"):set_visible(false)
 end)

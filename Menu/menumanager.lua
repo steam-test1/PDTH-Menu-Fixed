@@ -58,3 +58,102 @@ function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 	new_item:set_enabled(enabled)
 	node:add_item(new_item)
 end
+
+function MenuReticleSwitchInitiator:setup_node(node, data)
+	node:clean_items()
+
+	data = data or node:parameters().menu_component_data
+	local part_id = data.name
+	local slot = data.slot
+	local category = data.category
+	local color_index, type_index = managers.blackmarket:get_part_texture_switch_data(category, slot, part_id)
+
+	if not node:item("divider_end") then
+		local params = {
+			callback = "update_weapon_texture_switch",
+			name = "reticle_type",
+			filter = true,
+			text_id = "menu_reticle_type"
+		}
+		local data_node = {
+			type = "MenuItemMultiChoice"
+		}
+		local pass_dlc = nil
+
+		for index, reticle_data in ipairs(tweak_data.gui.weapon_texture_switches.types.sight) do
+			pass_dlc = not reticle_data.dlc or managers.dlc:is_dlc_unlocked(reticle_data.dlc)
+
+			table.insert(data_node, {
+				_meta = "option",
+				text_id = reticle_data.name_id,
+				value = index,
+				color = not pass_dlc and tweak_data.screen_colors.important_1
+			})
+		end
+
+		local new_item = node:create_item(data_node, params)
+
+		node:add_item(new_item)
+		new_item:set_value(type_index)
+
+		local params = {
+			callback = "update_weapon_texture_switch",
+			name = "reticle_color",
+			filter = true,
+			text_id = "menu_reticle_color"
+		}
+		local data_node = {
+			type = "MenuItemMultiChoice"
+		}
+
+		for index, color_data in ipairs(tweak_data:get_raw_value("gui", "weapon_texture_switches", "color_indexes") or {}) do
+			pass_dlc = not color_data.dlc or managers.dlc:is_dlc_unlocked(color_data.dlc)
+
+			table.insert(data_node, {
+				_meta = "option",
+				text_id = "menu_recticle_color_" .. color_data.color,
+				value = index,
+				color = not pass_dlc and PDTHMenu_color_normal
+			})
+		end
+
+		local new_item = node:create_item(data_node, params)
+
+		node:add_item(new_item)
+		new_item:set_value(color_index)
+		self:create_divider(node, "end", nil, 256)
+	end
+
+	local enabled = MenuCallbackHandler:is_reticle_applicable(node)
+	local params = {
+		callback = "set_weapon_texture_switch",
+		name = "confirm",
+		text_id = "dialog_apply",
+		align = "right",
+		enabled = enabled,
+		disabled_color = tweak_data.screen_colors.important_1
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+
+	node:add_item(new_item)
+
+	local params = {
+		last_item = "true",
+		name = "back",
+		text_id = "dialog_cancel",
+		align = "right",
+		previous_node = "true"
+	}
+	local data_node = {}
+	local new_item = node:create_item(data_node, params)
+
+	node:add_item(new_item)
+	node:set_default_item_name("reticle_type")
+	node:select_item("reticle_type")
+
+	node:parameters().menu_component_data = data
+	node:parameters().set_blackmarket_enabled = false
+
+	return node
+end

@@ -1,13 +1,10 @@
-local init_original = PlayerInventoryGui.init
+CloneClass(PlayerInventoryGui)
 function PlayerInventoryGui:init(ws, fullscreen_ws, node)	
-	init_original(self, ws, fullscreen_ws, node)
+	self.orig.init(self, ws, fullscreen_ws, node)
 	if managers.menu:is_pc_controller() then
 		local back_button = self._panel:child("back_button")
 		back_button:set_color(PDTHMenu_color_normal)
-		if PDTH_Menu.options.font_enable then
-			back_button:set_font(Idstring"fonts/pdth_menu_font")
-			back_button:set_font_size(19)
-		end
+		back_button:set_font_size(tweak_data.menu.pd2_medium_font_size)
 		if self._fullscreen_panel:child("back_button") then
 			self._fullscreen_panel:child("back_button"):set_visible(false)
 		end
@@ -21,7 +18,6 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 		self._back_marker:set_right(x + w)
 	end
 end
-local mouse_moved_original = PlayerInventoryGui.mouse_moved
 function PlayerInventoryGui:mouse_moved(o, x, y)
 	if self._panel:child("back_button"):inside(x, y) and managers.menu:is_pc_controller() then
 		used = true
@@ -38,7 +34,7 @@ function PlayerInventoryGui:mouse_moved(o, x, y)
 		self._back_marker:hide()
 		self._panel:child("back_button"):set_color(PDTHMenu_color_normal)
 	end	
-	mouse_moved_original(self, o,x,y)
+	self.orig.mouse_moved(self, o,x,y)
 end
 
 

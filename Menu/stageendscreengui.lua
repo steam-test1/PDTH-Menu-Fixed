@@ -615,3 +615,91 @@ function StageEndScreenGui:mouse_moved(x, y)
 	end
 	return false, "arrow"
 end
+function StageEndScreenGui:input_focus()
+	return self._enabled
+end
+function StageEndScreenGui:scroll_up()
+	if not alive(self._panel) or not alive(self._fullscreen_panel) or not self._enabled then
+		return
+	end
+	if self._items[self._selected_item] then
+		self._items[self._selected_item]:move_right()
+	end
+end
+function StageEndScreenGui:scroll_down()
+	if not alive(self._panel) or not alive(self._fullscreen_panel) or not self._enabled then
+		return
+	end
+	if self._items[self._selected_item] then
+		self._items[self._selected_item]:move_left()
+	end
+end
+function StageEndScreenGui:move_up()
+end
+function StageEndScreenGui:move_down()
+end
+function StageEndScreenGui:move_left()
+	if not alive(self._panel) or not alive(self._fullscreen_panel) or not self._enabled then
+		return
+	end
+	if self._items[self._selected_item] then
+		self._items[self._selected_item]:move_left()
+	end
+end
+function StageEndScreenGui:move_right()
+	if not alive(self._panel) or not alive(self._fullscreen_panel) or not self._enabled then
+		return
+	end
+	if self._items[self._selected_item] then
+		self._items[self._selected_item]:move_right()
+	end
+end
+function StageEndScreenGui:confirm_pressed()
+	if not alive(self._panel) or not alive(self._fullscreen_panel) or not self._enabled then
+		return
+	end
+	if game_state_machine:current_state()._continue_cb() then
+		game_state_machine:current_state()._continue_cb()
+		return true
+	end
+end
+function StageEndScreenGui:back_pressed()
+	if not alive(self._panel) or not alive(self._fullscreen_panel) or not self._enabled then
+		return false
+	end
+end
+function StageEndScreenGui:special_btn_pressed(btn)
+	if btn == Idstring("menu_challenge_claim") then
+		managers.hud:set_speed_up_endscreen_hud(5)
+	end
+end
+function StageEndScreenGui:accept_input(accept)
+	print("StageEndScreenGui:accept_input", accept)
+end
+function StageEndScreenGui:next_page(no_sound)
+	if not self._enabled then
+		return
+	end
+	self:next_tab(no_sound)
+end
+function StageEndScreenGui:previous_page(no_sound)
+	if not self._enabled then
+		return
+	end
+	self:prev_tab(no_sound)
+end
+function StageEndScreenGui:close()
+	if self._panel and alive(self._panel) then
+		self._panel:parent():remove(self._panel)
+	end
+	if self._fullscreen_panel and alive(self._fullscreen_panel) then
+		self._fullscreen_panel:parent():remove(self._fullscreen_panel)
+	end
+	if alive(self._console_subtitle_panel) then
+		self._console_subtitle_panel:parent():remove(self._console_subtitle_panel)
+	end
+end
+function StageEndScreenGui:reload()
+	self:close()
+	StageEndScreenGui.init(self, self._safe_workspace, self._full_workspace, self._data)
+end
