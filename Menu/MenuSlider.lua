@@ -4,6 +4,12 @@ core:import("CoreMenuItem")
 ItemSlider = ItemSlider or class(CoreMenuItem.Item)
 ItemSlider.TYPE = "slider"
 
+local init_original = ItemSlider.init
+function ItemSlider:init(data_node, parameters)
+	init_original(self, data_node, parameters)
+	self._slider_color = PDTHMenu_color_marker
+end
+
 function ItemSlider:setup_gui(node, row_item)
 	slider_color = _G.PDTH_Menu.colors[_G.PDTH_Menu.options.pdth_markercolor].color
 	slider_color2 = slider_color / 1.3
@@ -133,7 +139,7 @@ local safe_rect = managers.viewport:get_safe_rect_pixels()
 	row_item.gui_panel:set_height(h)
 	row_item.gui_panel:set_width(safe_rect.width / 2 + xl_pad)
 	row_item.gui_panel:set_x(safe_rect.width / 2 - xl_pad)
-	local sh = math.min(h, 22)	
+	local sh = math.min(h, 22)
 	row_item.gui_text:set_size(w + 5, h)
 	row_item.gui_text:set_left(node._right_align(node) - row_item.gui_panel:x())
 
@@ -157,5 +163,3 @@ local safe_rect = managers.viewport:get_safe_rect_pixels()
 		node:_align_info_panel(row_item)
 	end
 end
-
- 
