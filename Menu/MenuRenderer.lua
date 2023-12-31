@@ -42,8 +42,9 @@ function MenuRenderer:show_node( node )
 		row_item_hightlight_color = PDTHMenu_color_highlight,
 		font_size = PDTHMenu_font_size,
 		node_gui_class = gui_class,
-		spacing = node:parameters().spacing,
-		marker_color = PDTHMenu_color_marker
+		marker_color = PDTHMenu_color_marker,
+		--spacing = node:parameters().spacing,
+		spacing = 1 --tempfix for broken spacing in the main menu
 	}
 
 	local previous_node_gui = self._node_gui_stack[#self._node_gui_stack - 1]
