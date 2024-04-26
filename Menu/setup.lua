@@ -91,7 +91,7 @@ function Setup:_start_loading_screen()
 		local aspect_ratio = managers.viewport:aspect_ratio()
 		local res = RenderSettings.resolution
 		local job_data = managers.job:current_job_data() or {}
-		local bg_texture = load_level_data.level_tweak_data.load_screen or job_data.load_screen or "guis/textures/loading/loading_bg" and PDTH_Menu.options.enable_pdth_level_loading
+		local bg_texture = load_level_data.level_tweak_data.load_screen or job_data.load_screen or "guis/textures/loading/loading_foreground_pdth_original" and PDTH_Menu.options.enable_pdth_level_loading
 		load_level_data.gui_data = {
 			safe_rect_pixels = safe_rect_pixels,
 			safe_rect = safe_rect,
