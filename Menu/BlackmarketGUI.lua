@@ -330,13 +330,15 @@ function BlackMarketGui:mouse_moved(o, x, y)
 		if not self._back_button_highlighted then
 			self._back_button_highlighted = true
 			self._panel:child("back_button"):set_color(PDTHMenu_color_highlight)
-			self._panel:child("back_marker"):show()
+			-- self._panel:child("back_marker"):show()
+			self._panel:child("back_marker"):set_visible(true)
 			managers.menu_component:post_event("highlight")
 			return used, pointer
 		end
 	elseif self._back_button_highlighted then
 		self._back_button_highlighted = false
-		self._panel:child("back_marker"):hide()
+		-- self._panel:child("back_marker"):hide()
+		self._panel:child("back_marker"):set_visible(false)
 		self._panel:child("back_button"):set_color(PDTHMenu_color_normal)
 	end
 	update_select = false
@@ -414,7 +416,7 @@ function BlackMarketGui:mouse_moved(o, x, y)
 	end
 	return used, pointer
 end
- 
+
 
  function BlackMarketGuiSlotItem:select(instant, no_sound)
 	BlackMarketGuiSlotItem.super.select(self, instant, no_sound)
